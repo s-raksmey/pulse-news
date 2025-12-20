@@ -14,8 +14,14 @@ export const dropdownData: Record<DropdownKey, DropdownCategory> = {
       { label: "Economy", href: "/world/economy", description: "Global markets" },
     ],
     featured: [
-      { title: "Major peace talks announced", href: "/world/peace-talks", isBreaking: true },
-      { title: "UN emergency session called", href: "/world/un-session" },
+      {
+        title: "Major peace talks announced", href: "/world/peace-talks", isBreaking: true,
+        description: ""
+      },
+      {
+        title: "UN emergency session called", href: "/world/un-session",
+        description: ""
+      },
     ],
   },
 
@@ -32,8 +38,14 @@ export const dropdownData: Record<DropdownKey, DropdownCategory> = {
       { label: "Space", href: "/tech/space", description: "Space technology" },
     ],
     featured: [
-      { title: "AI breakthrough announced", href: "/tech/ai-breakthrough", isBreaking: true },
-      { title: "Major tech merger confirmed", href: "/tech/merger" },
+      {
+        title: "AI breakthrough announced", href: "/tech/ai-breakthrough", isBreaking: true,
+        description: ""
+      },
+      {
+        title: "Major tech merger confirmed", href: "/tech/merger",
+        description: ""
+      },
     ],
   },
 
@@ -50,8 +62,14 @@ export const dropdownData: Record<DropdownKey, DropdownCategory> = {
       { label: "Energy", href: "/business/energy", description: "Oil & renewable" },
     ],
     featured: [
-      { title: "Stock market hits record high", href: "/business/stock-record", isBreaking: true },
-      { title: "Major acquisition deal closes", href: "/business/acquisition" },
+      {
+        title: "Stock market hits record high", href: "/business/stock-record", isBreaking: true,
+        description: ""
+      },
+      {
+        title: "Major acquisition deal closes", href: "/business/acquisition",
+        description: ""
+      },
     ],
   },
 
@@ -68,8 +86,14 @@ export const dropdownData: Record<DropdownKey, DropdownCategory> = {
       { label: "Lobbying", href: "/politics/lobbying", description: "Influence & advocacy" },
     ],
     featured: [
-      { title: "New legislation proposed", href: "/politics/new-legislation", isBreaking: true },
-      { title: "Election poll results released", href: "/politics/poll-results" },
+      {
+        title: "New legislation proposed", href: "/politics/new-legislation", isBreaking: true,
+        description: ""
+      },
+      {
+        title: "Election poll results released", href: "/politics/poll-results",
+        description: ""
+      },
     ],
   },
 };
