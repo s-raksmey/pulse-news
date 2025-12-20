@@ -1,19 +1,13 @@
-// components/header.tsx
 "use client";
 
 import Link from "next/link";
-import {
-  Search,
-  Menu,
-  X,
-} from "lucide-react";
+import { Search, Menu, X } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import Navigation from "./navigation";
 import DropdownMenu from "./dropdown-menu";
 import MobileMenu from "./mobile-menu";
 import TopInfoBar from "./top-info-bar";
-import TrendingBar from "./trending-bar";
 import { dropdownData } from "@/data/dropdown-data";
 
 export default function Header() {
@@ -21,7 +15,6 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [showTrending, setShowTrending] = useState(true);
   const [dropdownKey, setDropdownKey] = useState<
     keyof typeof dropdownData | null
   >(null);
@@ -40,7 +33,6 @@ export default function Header() {
     if (label in dropdownData) {
       setDropdownKey(label as keyof typeof dropdownData);
       setDropdownOpen(true);
-      setShowTrending(false);
     }
   }, []);
 
@@ -48,7 +40,6 @@ export default function Header() {
     dropdownTimeoutRef.current = setTimeout(() => {
       setDropdownOpen(false);
       setDropdownKey(null);
-      setShowTrending(true);
     }, 150);
   }, []);
 
@@ -57,23 +48,17 @@ export default function Header() {
       clearTimeout(dropdownTimeoutRef.current);
     }
     setDropdownOpen(true);
-    setShowTrending(false);
   }, []);
 
   const handleDropdownMouseLeave = useCallback(() => {
     dropdownTimeoutRef.current = setTimeout(() => {
       setDropdownOpen(false);
       setDropdownKey(null);
-      setShowTrending(true);
     }, 150);
   }, []);
 
   const handleSearchToggle = useCallback(() => {
-    setSearchOpen((prev) => {
-      const newState = !prev;
-      setShowTrending(!newState);
-      return newState;
-    });
+    setSearchOpen((prev) => !prev);
   }, []);
 
   const handleLanguageToggle = useCallback(() => {
@@ -114,7 +99,6 @@ export default function Header() {
         !searchContainerRef.current.contains(event.target as Node)
       ) {
         setSearchOpen(false);
-        setShowTrending(true);
       }
     };
 
@@ -130,7 +114,6 @@ export default function Header() {
           setMobileOpen(false);
         } else if (searchOpen) {
           setSearchOpen(false);
-          setShowTrending(true);
         }
       }
     };
@@ -147,11 +130,11 @@ export default function Header() {
   }, []);
 
   return (
-    <>
+    <LayoutGroup>
       <header
         className={`sticky top-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "bg-white/95 backdrop-blur-lg shadow-lg border-b border-gray-100"
+            ? "bg-white/95 backdrop-blur-lg shadow-lg"
             : "bg-white"
         }`}
       >
@@ -289,11 +272,24 @@ export default function Header() {
           </div>
         </div>
 
-        <AnimatePresence>
-          {showTrending && !searchOpen && (
-            <TrendingBar />
-          )}
-        </AnimatePresence>
+        {/* Animated Border - Using layout animation */}
+        <motion.div
+          layout
+          className="border-b border-gray-200"
+          initial={false}
+          animate={{
+            opacity: dropdownOpen || searchOpen ? 0 : 1,
+            scaleY: dropdownOpen || searchOpen ? 0 : 1,
+            transformOrigin: "top",
+          }}
+          transition={{
+            duration: 0.2,
+            ease: "easeInOut",
+          }}
+          style={{
+            willChange: "transform, opacity",
+          }}
+        />
 
         <AnimatePresence>
           <MobileMenu
@@ -326,13 +322,13 @@ export default function Header() {
                     <input
                       autoFocus
                       placeholder="Search for news, topics, journalists..."
-                      className="w-full pl-10 lg:pl-12 pr-4 py-3 text-sm lg:text-base border-b border-gray-300 focus:border-blue-500 outline-none placeholder:text-gray-400 text-gray-700"
+                      className="w-full pl-10 lg:pl-12 pr-4 py-3 text-[14px] border-b border-gray-300 focus:border-blue-500 outline-none placeholder:text-gray-400 text-gray-700"
                     />
                   </div>
 
                   {/* Quick Suggestions */}
                   <div className="mb-4">
-                    <h3 className="text-xs font-semibold text-gray-500 uppercase mb-3">
+                    <h3 className="text-[11px] font-semibold tracking-wide text-gray-500 uppercase mb-3">
                       Quick Suggestions
                     </h3>
                     <div className="flex flex-wrap gap-2">
@@ -342,7 +338,7 @@ export default function Header() {
                       ].map((suggestion) => (
                         <button
                           key={suggestion}
-                          className="px-2 lg:px-3 py-1 lg:py-1.5 text-xs bg-gray-100 hover:bg-blue-50 hover:text-blue-600 rounded-full transition-colors"
+                          className="px-2 lg:px-3 py-1 lg:py-1.5 text-[11px] bg-gray-100 hover:bg-blue-50 hover:text-blue-600 rounded-full transition-colors"
                         >
                           {suggestion}
                         </button>
@@ -439,6 +435,6 @@ export default function Header() {
           onMouseLeave={handleDropdownMouseLeave}
         />
       )}
-    </>
+    </LayoutGroup>
   );
 }

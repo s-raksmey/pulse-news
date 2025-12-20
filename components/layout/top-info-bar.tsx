@@ -62,13 +62,13 @@ export default function TopInfoBar() {
               </div>
               
               {/* LIVE text */}
-              <span className="text-xs font-bold text-white tracking-wider">
+              <span className="text-[11px] font-semibold tracking-wide text-white">
                 LIVE
               </span>
             </div>
             
             {/* Latest Edition */}
-            <div className="flex items-center gap-2 text-xs font-medium text-white/90">
+            <div className="flex items-center gap-2 text-[11px] font-medium text-white/90">
               <Newspaper className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Latest Edition</span>
               <span className="sm:hidden">Latest</span>

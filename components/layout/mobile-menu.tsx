@@ -109,7 +109,7 @@ export default function MobileMenu({
                     key={item.label}
                     href={item.href}
                     onClick={onClose}
-                    className="block px-4 py-3.5 text-base font-medium text-gray-900 hover:bg-gray-50 rounded-lg mx-2 transition-colors"
+                    className="block px-4 py-3.5 text-[15px] font-medium text-gray-900 hover:bg-gray-50 rounded-lg mx-2 transition-colors"
                   >
                     {item.label}
                   </Link>
@@ -149,7 +149,7 @@ export default function MobileMenu({
                             key={sub.label}
                             href={sub.href}
                             onClick={onClose}
-                            className="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 border-t border-gray-200 first:border-t-0"
+                            className="block px-6 py-3 text-[13px] text-gray-700 hover:bg-gray-100 border-t border-gray-200 first:border-t-0"
                           >
                             {sub.label}
                           </Link>
