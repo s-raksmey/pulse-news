@@ -11,6 +11,7 @@ export interface DropdownItem {
 }
 
 export interface FeaturedItem {
+  description: string;
   title: string;
   href: string;
   isBreaking?: boolean;

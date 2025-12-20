@@ -23,11 +23,11 @@ export default function Navigation({ onDropdownEnter, onDropdownLeave }: Navigat
         >
           <Link
             href={item.href}
-            className="flex items-center gap-1 px-3 py-2 text-sm lg:text-base font-medium text-gray-700 hover:text-blue-600 transition-all duration-200 whitespace-nowrap group"
+            className="flex items-center gap-1 px-3 py-2 text-[13px] lg:text-[14px] font-medium text-gray-700 hover:text-blue-600 transition-all duration-200 whitespace-nowrap group"
           >
             {item.label}
             {item.type === "dropdown" && (
-              <ChevronDown className="h-4 w-4 ml-1 transition-transform duration-200 ease-in-out group-hover:rotate-180" />
+              <ChevronDown className="h-3.5 w-3.5 ml-0.5 transition-transform duration-200 ease-in-out group-hover:rotate-180" />
             )}
           </Link>
         </div>
