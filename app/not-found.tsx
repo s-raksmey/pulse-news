@@ -1,58 +1,30 @@
+// app/not-found.tsx
 import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <section className="relative flex min-h-[calc(100vh-80px)] items-center justify-center overflow-hidden bg-white px-6">
-      {/* Decorative background */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-blue-100 blur-3xl opacity-60" />
-        <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-indigo-100 blur-3xl opacity-60" />
-      </div>
-
-      <div className="relative z-10 max-w-2xl text-center">
-        {/* Big 404 */}
-        <div className="relative">
-          <span className="block text-[120px] font-black leading-none tracking-tight text-gray-900 sm:text-[160px]">
-            404
-          </span>
-          <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-xs font-semibold tracking-widest text-blue-600">
-            BREAKING NEWS
-          </span>
-        </div>
-
-        {/* Headline */}
-        <h1 className="mt-6 text-3xl font-black tracking-tight text-gray-900 sm:text-4xl">
-          This page is missing
-        </h1>
-
-        {/* Subheadline */}
-        <p className="mt-4 text-base leading-relaxed text-gray-600">
-          The story you’re looking for may have been moved, removed, or never
-          existed. Our newsroom couldn’t find it.
+    <main className="min-h-[70vh] flex items-center justify-center px-4">
+      <div className="max-w-md w-full rounded-2xl border border-gray-200 bg-white p-8 text-center">
+        <div className="text-sm font-semibold text-blue-600">PULSE NEWS</div>
+        <h1 className="mt-2 text-3xl font-black tracking-tight text-gray-900">404</h1>
+        <p className="mt-2 text-sm text-gray-600">
+          The page you’re looking for doesn’t exist (yet).
         </p>
-
-        {/* Actions */}
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+        <div className="mt-6 flex items-center justify-center gap-3">
           <Link
             href="/"
-            className="rounded-full bg-linear-to-r from-blue-600 to-indigo-600 px-8 py-3 text-sm font-semibold text-white hover:shadow-lg transition"
+            className="rounded-full bg-blue-600 px-5 py-2 text-sm font-bold text-white hover:shadow-lg"
           >
-            Back to homepage
+            Go Home
           </Link>
-
           <Link
-            href="/world"
-            className="rounded-full border border-gray-300 px-8 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
+            href="/search"
+            className="rounded-full border border-gray-200 px-5 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50"
           >
-            Read latest news
+            Search
           </Link>
         </div>
-
-        {/* Footer hint */}
-        <p className="mt-10 text-xs text-gray-400">
-          Error code: 404 · PULSE NEWS
-        </p>
       </div>
-    </section>
+    </main>
   );
 }

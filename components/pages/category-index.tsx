@@ -1,0 +1,67 @@
+"use client";
+
+import ArticleCard from "@/components/shared/article-card";
+import Breadcrumb from "@/components/shared/breadcrumb";
+import {
+  getArticlesByCategory,
+  getArticlesByCategoryAndSub,
+} from "@/data/mock-articles";
+
+interface CategoryIndexProps {
+  category: string;
+  title: string;
+  sub?: string;
+}
+
+export default function CategoryIndex({
+  category,
+  title,
+  sub,
+}: CategoryIndexProps) {
+  const list = sub
+    ? getArticlesByCategoryAndSub(capitalize(category), slugToTitle(sub))
+    : getArticlesByCategory(capitalize(category));
+
+  return (
+    <main className="container-8xl px-4 py-8">
+      <Breadcrumb
+        items={[
+          { label: "Home", href: "/" },
+          { label: capitalize(category), href: `/${category}` },
+          ...(sub
+            ? [{ label: slugToTitle(sub), href: `/${category}/${sub}` }]
+            : []),
+        ]}
+      />
+
+      <div className="mb-6">
+        <h1 className="text-3xl font-black tracking-tight text-gray-900">
+          {title}
+        </h1>
+        <p className="mt-2 text-sm text-gray-600">
+          Latest stories curated for {title}.
+        </p>
+      </div>
+
+      {list.length === 0 ? (
+        <div className="rounded-2xl border border-gray-200 p-6 text-sm text-gray-600">
+          No articles yet.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {list.map((article) => (
+            <ArticleCard key={article.id} article={article} />
+          ))}
+        </div>
+      )}
+    </main>
+  );
+}
+
+function capitalize(v: string) {
+  return v.charAt(0).toUpperCase() + v.slice(1);
+}
+
+function slugToTitle(v: string) {
+  return v.replace(/-/g, " ");
+}
