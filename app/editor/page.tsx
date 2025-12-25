@@ -5,43 +5,30 @@ import type { ClipboardEvent as ReactClipboardEvent } from "react";
 import NewsEditor, { NewsEditorRef } from "@/components/editor/news-editor";
 import EditorRenderer from "@/components/editor/editor-renderer";
 import type { OutputData } from "@editorjs/editorjs";
-
-interface ArticleRecord {
-  id: string;
-  title: string;
-  content: OutputData;
-  updatedAt: string;
-}
-
-const STORAGE_KEY = "news-list";
+import {
+  type ArticleRecord,
+  type ArticleStatus,
+  parseStoredArticles,
+  persistArticles,
+} from "@/utils/article-storage";
 
 function getInitialState() {
-  const fallback = {
-    articles: [] as ArticleRecord[],
-    selectedId: null as string | null,
-    title: "",
-    editorData: undefined as OutputData | undefined,
+  const articles = parseStoredArticles();
+  const requestedId =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("articleId")
+      : null;
+  const initialSelection = requestedId
+    ? articles.find((article) => article.id === requestedId) ?? articles[0]
+    : articles[0];
+
+  return {
+    articles,
+    selectedId: initialSelection?.id ?? null,
+    title: initialSelection?.title ?? "",
+    editorData: initialSelection?.content,
+    status: initialSelection?.status ?? "draft",
   };
-
-  if (typeof window === "undefined") return fallback;
-
-  try {
-    const cached = localStorage.getItem(STORAGE_KEY);
-    if (!cached) return fallback;
-
-    const parsed = JSON.parse(cached) as ArticleRecord[];
-    const first = parsed[0];
-
-    return {
-      articles: parsed,
-      selectedId: first?.id ?? null,
-      title: first?.title ?? "",
-      editorData: first?.content,
-    };
-  } catch (error) {
-    console.error("Failed to parse saved articles", error);
-    return fallback;
-  }
 }
 
 function escapeHtml(text: string) {
@@ -88,6 +75,13 @@ function validateArticle(title: string, data: OutputData) {
   return "";
 }
 
+const statusLabels: Record<ArticleStatus, string> = {
+  draft: "Draft",
+  in_review: "In review",
+  scheduled: "Scheduled",
+  published: "Published",
+};
+
 export default function EditorPlaygroundPage() {
   const initialState = getInitialState();
   const editorRef = useRef<NewsEditorRef | null>(null);
@@ -98,22 +92,24 @@ export default function EditorPlaygroundPage() {
     initialState.selectedId
   );
   const [title, setTitle] = useState(initialState.title);
-  const [editorData, setEditorData] = useState<OutputData | undefined>(
-    initialState.editorData
+  const [editorData, setEditorData] = useState(initialState.editorData);
+  const [articleStatus, setArticleStatus] = useState<ArticleStatus>(
+    initialState.status
   );
   const [view, setView] = useState<"edit" | "preview">("edit");
-  const [status, setStatus] = useState<string>("");
+  const [statusMessage, setStatusMessage] = useState<string>("");
 
   const persist = useCallback((nextArticles: ArticleRecord[]) => {
     setArticles(nextArticles);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextArticles));
+    persistArticles(nextArticles);
   }, []);
 
   const resetForm = useCallback(() => {
     setSelectedId(null);
     setTitle("");
     setEditorData({ blocks: [] });
-    setStatus("Started a fresh draft");
+    setArticleStatus("draft");
+    setStatusMessage("Started a fresh draft");
   }, []);
 
   const handleSave = useCallback(async () => {
@@ -123,7 +119,7 @@ export default function EditorPlaygroundPage() {
     const sanitized = sanitizeOutput(output);
     const validationError = validateArticle(title, sanitized);
     if (validationError) {
-      setStatus(validationError);
+      setStatusMessage(validationError);
       return;
     }
 
@@ -132,6 +128,7 @@ export default function EditorPlaygroundPage() {
       title: escapeHtml(title.trim()),
       content: sanitized,
       updatedAt: new Date().toISOString(),
+      status: articleStatus,
     };
 
     const next = selectedId
@@ -142,22 +139,23 @@ export default function EditorPlaygroundPage() {
 
     persist(next);
     setSelectedId(nextArticle.id);
-    setStatus("Saved — blocks validated and sanitized");
-  }, [articles, persist, selectedId, title]);
+    setStatusMessage("Saved — blocks validated and sanitized");
+  }, [articleStatus, articles, persist, selectedId, title]);
 
   const handleDelete = useCallback(() => {
     if (!selectedId) return;
     const filtered = articles.filter((article) => article.id !== selectedId);
     persist(filtered);
     resetForm();
-    setStatus("Deleted the article from local storage");
+    setStatusMessage("Deleted the article from local storage");
   }, [articles, persist, resetForm, selectedId]);
 
   const handleLoad = useCallback((article: ArticleRecord) => {
     setSelectedId(article.id);
     setTitle(article.title);
     setEditorData(article.content);
-    setStatus("Loaded saved data back into the editor");
+    setArticleStatus(article.status ?? "draft");
+    setStatusMessage("Loaded saved data back into the editor");
   }, []);
 
   const insertQuoteFromApi = useCallback(() => {
@@ -170,7 +168,7 @@ export default function EditorPlaygroundPage() {
       },
       0
     );
-    setStatus("Used EditorJS API to insert a block");
+    setStatusMessage("Used EditorJS API to insert a block");
   }, []);
 
   const handlePasteSubstitution = useCallback(
@@ -187,7 +185,7 @@ export default function EditorPlaygroundPage() {
           },
           0
         );
-        setStatus("Converted pasted text into a quote block");
+        setStatusMessage("Converted pasted text into a quote block");
       }
     },
     []
@@ -219,6 +217,22 @@ export default function EditorPlaygroundPage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
+            <label className="text-xs font-semibold text-gray-600">
+              Status
+              <select
+                className="mt-1 w-full rounded border px-3 py-2 text-sm"
+                value={articleStatus}
+                onChange={(event) =>
+                  setArticleStatus(event.target.value as ArticleStatus)
+                }
+              >
+                {Object.entries(statusLabels).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
             <button
               className="rounded border px-3 py-2 text-sm"
               onClick={resetForm}
@@ -278,9 +292,9 @@ export default function EditorPlaygroundPage() {
             </div>
           )}
 
-          {status && (
+          {statusMessage && (
             <div className="rounded border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900">
-              {status}
+              {statusMessage}
             </div>
           )}
         </div>
@@ -301,28 +315,33 @@ export default function EditorPlaygroundPage() {
             )}
           </header>
 
-          <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-1">
-            {articles.length === 0 && (
-              <p className="text-sm text-gray-500">No articles saved yet.</p>
-            )}
+        <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-1">
+          {articles.length === 0 && (
+            <p className="text-sm text-gray-500">No articles saved yet.</p>
+          )}
 
-            {articles.map((article) => (
-              <button
-                key={article.id}
-                className={`w-full rounded border px-3 py-2 text-left text-sm transition hover:border-blue-400 hover:bg-blue-50 ${
-                  selectedId === article.id
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200"
-                }`}
-                onClick={() => handleLoad(article)}
-              >
+          {articles.map((article) => (
+            <button
+              key={article.id}
+              className={`w-full rounded border px-3 py-2 text-left text-sm transition hover:border-blue-400 hover:bg-blue-50 ${
+                selectedId === article.id
+                  ? "border-blue-500 bg-blue-50"
+                  : "border-gray-200"
+              }`}
+              onClick={() => handleLoad(article)}
+            >
+              <div className="flex items-start justify-between gap-3">
                 <p className="font-semibold text-gray-900 break-words">{article.title}</p>
-                <p className="text-xs text-gray-500">
-                  Updated {new Date(article.updatedAt).toLocaleString()}
-                </p>
-              </button>
-            ))}
-          </div>
+                <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700">
+                  {statusLabels[article.status]}
+                </span>
+              </div>
+              <p className="text-xs text-gray-500">
+                Updated {new Date(article.updatedAt).toLocaleString()}
+              </p>
+            </button>
+          ))}
+        </div>
         </aside>
       </section>
     </main>
