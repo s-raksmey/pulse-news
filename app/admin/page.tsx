@@ -120,7 +120,7 @@ const tasks = [
 export default function AdminDashboard() {
   return (
     <main className="bg-gray-50">
-      <section className="container-8xl px-4 py-10 space-y-10">
+      <section className="mx-auto max-w-7xl px-4 py-10 space-y-10">
         <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -133,8 +133,8 @@ export default function AdminDashboard() {
                 Live
               </span>
             </div>
-            <p className="text-sm text-gray-600">
-              Monitor publishing velocity, review queue, and team activity in real-time.
+            <p className="max-w-3xl text-sm text-gray-600">
+              Monitor publishing velocity, review queue, and team activity in real-time so data and content stay aligned across the CMS.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -191,20 +191,20 @@ export default function AdminDashboard() {
               </div>
 
               <div className="mt-4 overflow-hidden rounded-xl border border-gray-100">
-                <table className="w-full text-left text-sm">
+                <table className="w-full table-fixed text-left text-sm">
                   <thead className="bg-gray-50 text-gray-600">
                     <tr>
-                      <th className="px-4 py-3 font-semibold">Story</th>
-                      <th className="px-4 py-3 font-semibold">Section</th>
-                      <th className="px-4 py-3 font-semibold">Status</th>
-                      <th className="px-4 py-3 font-semibold">Owner</th>
-                      <th className="px-4 py-3 font-semibold">Publish</th>
+                      <th className="w-[34%] px-4 py-3 font-semibold">Story</th>
+                      <th className="w-[12%] px-4 py-3 font-semibold">Section</th>
+                      <th className="w-[16%] px-4 py-3 font-semibold">Status</th>
+                      <th className="w-[18%] px-4 py-3 font-semibold">Owner</th>
+                      <th className="w-[20%] px-4 py-3 font-semibold">Publish</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 bg-white">
                     {recentContent.map((story) => (
                       <tr key={story.title} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 font-semibold text-gray-900">
+                        <td className="px-4 py-3 font-semibold text-gray-900 break-words">
                           {story.title}
                         </td>
                         <td className="px-4 py-3 text-gray-600">{story.section}</td>
@@ -216,8 +216,8 @@ export default function AdminDashboard() {
                             {story.status}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-gray-600">{story.owner}</td>
-                        <td className="px-4 py-3 text-gray-600">{story.publishAt}</td>
+                        <td className="px-4 py-3 text-gray-600 break-words">{story.owner}</td>
+                        <td className="px-4 py-3 text-gray-600 break-words">{story.publishAt}</td>
                       </tr>
                     ))}
                   </tbody>
