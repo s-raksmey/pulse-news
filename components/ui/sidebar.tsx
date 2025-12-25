@@ -29,6 +29,22 @@ export function SidebarProvider({
 }) {
   const [open, setOpen] = React.useState(defaultOpen);
 
+  React.useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 1024px)");
+
+    const handleMediaChange = (
+      event: MediaQueryList | MediaQueryListEvent
+    ) => {
+      const isDesktop = event.matches;
+      setOpen(isDesktop ? defaultOpen : false);
+    };
+
+    handleMediaChange(mediaQuery);
+    mediaQuery.addEventListener("change", handleMediaChange);
+
+    return () => mediaQuery.removeEventListener("change", handleMediaChange);
+  }, [defaultOpen]);
+
   const value = React.useMemo(
     () => ({
       open,
