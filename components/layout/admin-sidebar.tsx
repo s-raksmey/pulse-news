@@ -1,5 +1,23 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { LayoutDashboard, FilePenLine, FolderKanban, Settings } from "lucide-react";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+  SidebarSeparator,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 
 const links = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -9,23 +27,55 @@ const links = [
 ];
 
 export default function AdminSidebar() {
+  const pathname = usePathname();
+
   return (
-    <aside className="w-full max-w-xs border-r border-gray-200 bg-white/60">
-      <div className="px-4 py-6">
-        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">CMS</div>
-        <nav className="mt-4 space-y-1">
-          {links.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              <item.icon className="h-4 w-4 text-gray-500" />
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-      </div>
-    </aside>
+    <Sidebar collapsible="icon" className="border-gray-200">
+      <SidebarHeader>
+        <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-900 text-white">PN</div>
+          <div className="leading-none">
+            <p className="text-xs uppercase tracking-wide text-gray-500">Pulse</p>
+            <p>News CMS</p>
+          </div>
+        </div>
+        <SidebarTrigger aria-label="Toggle sidebar" />
+      </SidebarHeader>
+
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>CMS</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {links.map((item) => {
+                const Icon = item.icon;
+                const isActive = pathname === item.href;
+
+                return (
+                  <SidebarMenuItem key={item.href}>
+                    <Link href={item.href} className="block">
+                      <SidebarMenuButton
+                        isActive={isActive}
+                        leading={<Icon className="h-4 w-4" />}
+                        aria-current={isActive ? "page" : undefined}
+                      >
+                        {item.label}
+                      </SidebarMenuButton>
+                    </Link>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter>
+        <SidebarSeparator />
+        <p className="px-2 text-xs text-gray-500">Local drafts stay on this device.</p>
+      </SidebarFooter>
+
+      <SidebarRail />
+    </Sidebar>
   );
 }
