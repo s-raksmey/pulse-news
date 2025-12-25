@@ -1,3 +1,5 @@
+// components/editor/news-editor.tsx
+
 "use client";
 
 import {

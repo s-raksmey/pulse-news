@@ -1,4 +1,5 @@
 // components/pages/author-profile.tsx
+
 import Breadcrumb from "@/components/shared/breadcrumb";
 import ArticleCard from "@/components/shared/article-card";
 import { getArticlesByAuthor, getAllArticles } from "@/data/mock-articles";

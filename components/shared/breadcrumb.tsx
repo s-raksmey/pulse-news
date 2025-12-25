@@ -1,3 +1,5 @@
+// components/shared/breadcrumb.tsx
+
 import Link from "next/link";
 
 export default function Breadcrumb({

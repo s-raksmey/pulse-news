@@ -1,4 +1,5 @@
-// components/trending-bar.tsx
+// components/layout/trending-bar.tsx
+
 import { ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
 

@@ -1,3 +1,5 @@
+// components/pages/category-index.tsx
+
 "use client";
 
 import ArticleCard from "@/components/shared/article-card";

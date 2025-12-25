@@ -1,3 +1,5 @@
+// components/home/latest-news.tsx
+
 "use client";
 
 import { useSyncExternalStore } from "react";

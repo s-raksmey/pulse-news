@@ -1,3 +1,5 @@
+// app/politics/[slug]/page.tsx
+
 "use client";
 
 import { useParams } from "next/navigation";

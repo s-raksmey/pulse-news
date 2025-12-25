@@ -1,4 +1,5 @@
-// components/mobile-menu.tsx - UPDATED VERSION
+// components/layout/mobile-menu.tsx
+
 "use client";
 
 import Link from "next/link";

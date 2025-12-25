@@ -1,4 +1,5 @@
 // components/home/hero-news.tsx
+
 import { getAllArticles } from "@/data/mock-articles";
 import ArticleCard from "@/components/shared/article-card";
 

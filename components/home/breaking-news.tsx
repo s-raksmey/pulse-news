@@ -1,4 +1,5 @@
 // components/home/breaking-news.tsx
+
 import Link from "next/link";
 import { getAllArticles } from "@/data/mock-articles";
 

@@ -1,4 +1,5 @@
 // app/page.tsx
+
 import HeroNews from "@/components/home/hero-news";
 import BreakingNews from "@/components/home/breaking-news";
 import LatestNews from "@/components/home/latest-news";
