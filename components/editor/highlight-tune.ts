@@ -1,45 +1,47 @@
 "use client";
 
-import type { API } from "@editorjs/editorjs";
+import type { API, BlockTune } from "@editorjs/editorjs";
 
 interface HighlightData {
   highlighted?: boolean;
 }
 
-export default class HighlightTune {
+export default class HighlightTune implements BlockTune {
   private api: API;
   private data: HighlightData;
   private button: HTMLButtonElement;
   private settingsButtonClass: string;
   private activeSettingsButtonClass: string;
 
-  static get isTune() {
+  static get isTune(): boolean {
     return true;
   }
 
-  constructor({ api, data }: { api: API; data: HighlightData }) {
+  constructor({ api, data }: { api: API; data?: HighlightData }) {
     this.api = api;
-    this.data = data || {};
-
-    // The EditorJS API may not always provide style class names depending on
-    // how the bundle is loaded (e.g. Turbopack).
-    // Provide fallbacks to avoid runtime errors that skip block rendering.
+    this.data = data ?? {};
     this.settingsButtonClass =
       this.api.styles?.settingsButton ?? "cdx-settings-button";
     this.activeSettingsButtonClass =
-      this.api.styles?.settingsButtonActive ?? "cdx-settings-button--active";
+      this.api.styles?.settingsButtonActive ??
+      "cdx-settings-button--active";
 
     this.button = document.createElement("button");
     this.button.type = "button";
-    this.button.classList.add(this.settingsButtonClass);
+    this.button.className = this.settingsButtonClass;
     this.button.innerHTML = "⚡";
     this.button.title = "Toggle highlight";
+
     this.button.addEventListener("click", () => {
       this.data.highlighted = !this.data.highlighted;
-      this.render();
+      this.render();   // update button active state
+      this.apply();    // apply class to block holder
     });
   }
 
+  /**
+   * Render the tune button in the block settings menu
+   */
   render() {
     if (this.data.highlighted) {
       this.button.classList.add(this.activeSettingsButtonClass);
@@ -49,20 +51,37 @@ export default class HighlightTune {
     return this.button;
   }
 
-  save() {
+  /**
+   * Return saved tune data
+   */
+  save(): HighlightData {
     return {
       highlighted: Boolean(this.data.highlighted),
     };
   }
 
-  wrap(blockContent: HTMLElement) {
-    blockContent.style.transition = "background-color 150ms ease";
-    if (this.data.highlighted) {
-      blockContent.style.backgroundColor = "#fff7ed"; // amber-50
-      blockContent.style.borderLeft = "4px solid #fb923c"; // amber-400
-      blockContent.style.padding = "12px";
-      blockContent.style.borderRadius = "12px";
-    }
+  /**
+   * REQUIRED for compatibility with Paragraph and other core blocks.
+   * Passthrough implementation – returns the original content unchanged.
+   * This prevents Editor.js from skipping the block due to "plugins error".
+   */
+  wrap(blockContent: HTMLElement): HTMLElement {
     return blockContent;
+  }
+
+  /**
+   * Apply the highlight by toggling a custom class on the block's holder element.
+   * This is safe and works reliably with Paragraph blocks.
+   */
+  private apply() {
+    const index = this.api.blocks.getCurrentBlockIndex();
+    const block = this.api.blocks.getBlockByIndex(index);
+
+    if (!block || !(block.holder instanceof HTMLElement)) return;
+
+    block.holder.classList.toggle(
+      "editor-highlight",
+      Boolean(this.data.highlighted)
+    );
   }
 }
