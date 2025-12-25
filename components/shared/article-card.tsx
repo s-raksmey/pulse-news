@@ -1,3 +1,5 @@
+// components/shared/article-card.tsx
+
 import Link from "next/link";
 import type { Article } from "@/types/article";
 

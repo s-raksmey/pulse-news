@@ -1,4 +1,5 @@
 // components/article/article-content.tsx
+
 import type { EditorContent } from "@/types/article";
 import EditorRenderer from "@/components/editor/editor-renderer";
 

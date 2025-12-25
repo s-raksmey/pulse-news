@@ -1,4 +1,5 @@
 // components/article/related-articles.tsx
+
 import type { Article } from "@/types/article";
 import ArticleCard from "@/components/shared/article-card";
 

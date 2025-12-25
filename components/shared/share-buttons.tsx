@@ -1,3 +1,5 @@
+// components/shared/share-buttons.tsx
+
 "use client";
 
 import { usePathname, useSearchParams } from "next/navigation";

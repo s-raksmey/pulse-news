@@ -1,4 +1,5 @@
-// components/top-info-bar.tsx
+// components/layout/top-info-bar.tsx
+
 import { Facebook, Youtube, Send, Newspaper, Instagram, Twitter } from "lucide-react";
 
 export default function TopInfoBar() {

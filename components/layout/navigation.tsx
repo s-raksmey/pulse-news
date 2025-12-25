@@ -1,4 +1,5 @@
-// components/navigation.tsx
+// components/layout/navigation.tsx
+
 "use client";
 
 import Link from "next/link";

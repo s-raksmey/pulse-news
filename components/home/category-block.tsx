@@ -1,4 +1,5 @@
 // components/home/category-block.tsx
+
 import Link from "next/link";
 import { getAllArticles } from "@/data/mock-articles";
 import ArticleCard from "@/components/shared/article-card";

@@ -1,4 +1,5 @@
 // components/pages/search-page.tsx
+
 "use client";
 
 import { useMemo, useState } from "react";

@@ -1,3 +1,5 @@
+// app/news/[slug]/page.tsx
+
 import { getAllArticles, getArticleBySlug } from "@/data/mock-articles";
 import Breadcrumb from "@/components/shared/breadcrumb";
 import ArticleHeader from "@/components/article/article-header";
