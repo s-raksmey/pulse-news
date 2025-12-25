@@ -8,9 +8,9 @@ import {
 } from "@/data/mock-articles";
 
 interface CategoryIndexProps {
-  category: string;
-  title: string;
-  sub?: string;
+  category: string; // slug: "tech"
+  title: string;    // display: "Tech / AI ML"
+  sub?: string;     // slug: "ai-ml"
 }
 
 export default function CategoryIndex({
@@ -18,16 +18,17 @@ export default function CategoryIndex({
   title,
   sub,
 }: CategoryIndexProps) {
+  // ✅ USE SLUGS FOR FILTERING
   const list = sub
-    ? getArticlesByCategoryAndSub(capitalize(category), slugToTitle(sub))
-    : getArticlesByCategory(capitalize(category));
+    ? getArticlesByCategoryAndSub(category, sub)
+    : getArticlesByCategory(category);
 
   return (
     <main className="container-8xl px-4 py-8">
       <Breadcrumb
         items={[
           { label: "Home", href: "/" },
-          { label: capitalize(category), href: `/${category}` },
+          { label: titleCase(category), href: `/${category}` },
           ...(sub
             ? [{ label: slugToTitle(sub), href: `/${category}/${sub}` }]
             : []),
@@ -58,10 +59,15 @@ export default function CategoryIndex({
   );
 }
 
-function capitalize(v: string) {
+/* ---------- helpers (display only) ---------- */
+
+function titleCase(v: string) {
   return v.charAt(0).toUpperCase() + v.slice(1);
 }
 
-function slugToTitle(v: string) {
-  return v.replace(/-/g, " ");
+function slugToTitle(slug: string) {
+  return slug
+    .split("-")
+    .map((w) => w.toUpperCase())
+    .join(" ");
 }
