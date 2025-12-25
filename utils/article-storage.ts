@@ -5,6 +5,8 @@ export type ArticleStatus = "draft" | "in_review" | "scheduled" | "published";
 export interface ArticleRecord {
   id: string;
   title: string;
+  category: string;
+  author: string;
   content: OutputData;
   updatedAt: string;
   status: ArticleStatus;
@@ -23,6 +25,8 @@ export function parseStoredArticles(): ArticleRecord[] {
 
     return parsed.map((article) => ({
       ...article,
+      category: article.category ?? "",
+      author: article.author ?? "",
       status: article.status ?? "draft",
     }));
   } catch (error) {
