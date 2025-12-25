@@ -199,21 +199,20 @@ export default function EditorPlaygroundPage() {
   );
 
   return (
-    <main className="container-8xl px-4 py-10 space-y-8">
+    <main className="mx-auto max-w-7xl px-4 py-10 space-y-8">
       <header className="space-y-2">
         <p className="text-xs uppercase tracking-wide text-blue-600">EditorJS</p>
         <h1 className="text-3xl font-bold text-gray-900">Article playground</h1>
-        <p className="max-w-3xl text-sm text-gray-600">
-          Create, read, update, and delete articles saved in local storage. The
-          editor is configured with inline toolbars, custom block settings,
-          paste substitutions, and sanitization to showcase a full EditorJS
-          workflow.
+        <p className="max-w-4xl text-sm text-gray-600">
+          Create, read, update, and delete articles saved in local storage. The editor is configured with inline toolbars,
+          custom block settings, paste substitutions, and sanitization to keep data and rendered content in sync across
+          components.
         </p>
       </header>
 
       <section className="grid gap-6 lg:grid-cols-[2fr,1fr]">
         <div className="space-y-4">
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3 rounded-lg bg-white p-4 shadow-sm ring-1 ring-gray-100">
             <input
               className="min-w-0 flex-1 rounded border px-3 py-2 text-sm"
               placeholder="Article title"
@@ -302,7 +301,7 @@ export default function EditorPlaygroundPage() {
             )}
           </header>
 
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-1">
             {articles.length === 0 && (
               <p className="text-sm text-gray-500">No articles saved yet.</p>
             )}
@@ -317,7 +316,7 @@ export default function EditorPlaygroundPage() {
                 }`}
                 onClick={() => handleLoad(article)}
               >
-                <p className="font-semibold text-gray-900">{article.title}</p>
+                <p className="font-semibold text-gray-900 break-words">{article.title}</p>
                 <p className="text-xs text-gray-500">
                   Updated {new Date(article.updatedAt).toLocaleString()}
                 </p>
