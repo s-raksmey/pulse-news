@@ -4,7 +4,7 @@
 
 import { useMemo, useState } from "react";
 import Breadcrumb from "@/components/shared/breadcrumb";
-import ArticleCard from "@/components/shared/article-card";
+import ArticleCard from "@/components/news/article-card";
 import { searchArticles } from "@/data/mock-articles";
 
 export default function SearchPage({ query }: { query: string }) {

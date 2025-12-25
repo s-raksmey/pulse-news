@@ -1,6 +1,6 @@
 // components/pages/blog-index.tsx
 
-import ArticleCard from "@/components/shared/article-card";
+import ArticleCard from "@/components/news/article-card";
 import Breadcrumb from "@/components/shared/breadcrumb";
 import { getAllArticles } from "@/data/mock-articles";
 

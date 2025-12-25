@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { getAllArticles } from "@/data/mock-articles";
-import ArticleCard from "@/components/shared/article-card";
+import ArticleCard from "@/components/news/article-card";
 import type { CategoryKey } from "@/types/article";
 
 export default function CategoryBlock({ category }: { category: CategoryKey }) {
@@ -14,7 +14,10 @@ export default function CategoryBlock({ category }: { category: CategoryKey }) {
     <section>
       <div className="flex items-end justify-between mb-4">
         <h2 className="text-lg font-bold text-gray-900">{category}</h2>
-        <Link href={`/${category.toLowerCase()}`} className="text-xs font-semibold text-blue-600 hover:underline">
+        <Link
+          href={`/category/${category.toLowerCase()}`}
+          className="text-xs font-semibold text-blue-600 hover:underline"
+        >
           See more
         </Link>
       </div>

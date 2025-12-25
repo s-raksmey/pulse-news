@@ -20,10 +20,10 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-bold text-gray-900 mb-3">Sections</h3>
             <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
-              <Link href="/world" className="hover:text-blue-600">World</Link>
-              <Link href="/tech" className="hover:text-blue-600">Tech</Link>
-              <Link href="/business" className="hover:text-blue-600">Business</Link>
-              <Link href="/politics" className="hover:text-blue-600">Politics</Link>
+              <Link href="/category/world" className="hover:text-blue-600">World</Link>
+              <Link href="/category/tech" className="hover:text-blue-600">Tech</Link>
+              <Link href="/category/business" className="hover:text-blue-600">Business</Link>
+              <Link href="/category/politics" className="hover:text-blue-600">Politics</Link>
               <Link href="/blog" className="hover:text-blue-600">Blog</Link>
               <Link href="/search" className="hover:text-blue-600">Search</Link>
             </div>
