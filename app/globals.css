@@ -572,3 +572,9 @@ body {
     display: none !important;
   }
 }
+
+.editor-highlight {
+  background-color: #fffacd; /* lemon chiffon */
+  border-left: 4px solid #f6e05e;
+  padding-left: 12px;
+}
