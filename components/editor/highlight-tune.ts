@@ -10,6 +10,8 @@ export default class HighlightTune {
   private api: API;
   private data: HighlightData;
   private button: HTMLButtonElement;
+  private settingsButtonClass: string;
+  private activeSettingsButtonClass: string;
 
   static get isTune() {
     return true;
@@ -18,9 +20,18 @@ export default class HighlightTune {
   constructor({ api, data }: { api: API; data: HighlightData }) {
     this.api = api;
     this.data = data || {};
+
+    // The EditorJS API may not always provide style class names depending on
+    // how the bundle is loaded (e.g. Turbopack).
+    // Provide fallbacks to avoid runtime errors that skip block rendering.
+    this.settingsButtonClass =
+      this.api.styles?.settingsButton ?? "cdx-settings-button";
+    this.activeSettingsButtonClass =
+      this.api.styles?.settingsButtonActive ?? "cdx-settings-button--active";
+
     this.button = document.createElement("button");
     this.button.type = "button";
-    this.button.classList.add(this.api.styles.settingsButton);
+    this.button.classList.add(this.settingsButtonClass);
     this.button.innerHTML = "⚡";
     this.button.title = "Toggle highlight";
     this.button.addEventListener("click", () => {
@@ -31,9 +42,9 @@ export default class HighlightTune {
 
   render() {
     if (this.data.highlighted) {
-      this.button.classList.add(this.api.styles.settingsButtonActive);
+      this.button.classList.add(this.activeSettingsButtonClass);
     } else {
-      this.button.classList.remove(this.api.styles.settingsButtonActive);
+      this.button.classList.remove(this.activeSettingsButtonClass);
     }
     return this.button;
   }
