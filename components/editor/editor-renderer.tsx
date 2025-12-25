@@ -1,60 +1,123 @@
-// components/editor/editor-renderer.tsx
-import type { EditorContent, EditorBlock } from "@/types/article";
+"use client";
 
-type HeaderData = { text: string; level?: number };
-type ParagraphData = { text: string };
-type QuoteData = { text: string; caption?: string };
-type ListData = { style?: "ordered" | "unordered"; items: string[] };
+import { useEffect } from "react";
+import type { OutputData } from "@editorjs/editorjs";
 
-export default function EditorRenderer({ content }: { content: EditorContent }) {
-  return (
-    <article className="prose prose-gray max-w-none">
-      {content.blocks.map((block) => renderBlock(block))}
-    </article>
-  );
+interface Props {
+  content: OutputData;
 }
 
-function renderBlock(block: EditorBlock): React.ReactNode {
-  switch (block.type) {
-    case "header": {
-      const data = block.data as HeaderData;
-      const level = data.level ?? 2;
-      if (level === 1) return <h1 key={block.id}>{data.text}</h1>;
-      if (level === 2) return <h2 key={block.id}>{data.text}</h2>;
-      if (level === 3) return <h3 key={block.id}>{data.text}</h3>;
-      return <h4 key={block.id}>{data.text}</h4>;
-    }
-
-    case "paragraph": {
-      const data = block.data as ParagraphData;
-      return <p key={block.id}>{data.text}</p>;
-    }
-
-    case "quote": {
-      const data = block.data as QuoteData;
-      return (
-        <blockquote key={block.id}>
-          <p>{data.text}</p>
-          {data.caption ? <cite>{data.caption}</cite> : null}
-        </blockquote>
-      );
-    }
-
-    case "list": {
-      const data = block.data as ListData;
-      const ordered = data.style === "ordered";
-      const ListTag = ordered ? "ol" : "ul";
-      return (
-        <ListTag key={block.id}>
-          {data.items.map((it, i) => (
-            <li key={`${block.id}-${i}`}>{it}</li>
-          ))}
-        </ListTag>
-      );
-    }
-
-    // image/embed blocks can be added later (still frontend-only)
-    default:
-      return null;
+function toYoutubeEmbed(url: string): string {
+  if (url.includes("youtu.be")) {
+    return `https://www.youtube.com/embed/${url.split("/").pop()}`;
   }
+  const id = new URL(url).searchParams.get("v");
+  return `https://www.youtube.com/embed/${id}`;
+}
+
+export default function EditorRenderer({ content }: Props) {
+  useEffect(() => {
+    // Load Facebook SDK once
+    if (!document.getElementById("facebook-jssdk")) {
+      const s = document.createElement("script");
+      s.id = "facebook-jssdk";
+      s.src =
+        "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v18.0";
+      s.async = true;
+      document.body.appendChild(s);
+    } else {
+      window.FB?.XFBML?.parse();
+    }
+
+    // Instagram
+    if (!document.getElementById("instagram-embed")) {
+      const s = document.createElement("script");
+      s.id = "instagram-embed";
+      s.src = "https://www.instagram.com/embed.js";
+      s.async = true;
+      document.body.appendChild(s);
+    } else {
+      window.instgrm?.Embeds?.process();
+    }
+  }, [content]);
+
+  return (
+    <article className="prose max-w-none">
+      {content.blocks.map((block, i) => {
+        switch (block.type) {
+          case "paragraph":
+            return (
+              <p
+                key={i}
+                dangerouslySetInnerHTML={{
+                  __html: block.data.text,
+                }}
+              />
+            );
+
+          case "header":
+            return <h2 key={i}>{block.data.text}</h2>;
+
+          case "list":
+            return (
+              <ul key={i}>
+                {block.data.items.map(
+                  (t: string, idx: number) => (
+                    <li key={idx}>{t}</li>
+                  )
+                )}
+              </ul>
+            );
+
+          case "quote":
+            return (
+              <blockquote key={i}>
+                <p>{block.data.text}</p>
+              </blockquote>
+            );
+
+          case "video":
+            // Facebook Reel / Video (IMPORTANT)
+            if (
+              block.data.url.includes("facebook.com") ||
+              block.data.url.includes("fb.watch")
+            ) {
+              return (
+                <div key={i} className="my-6">
+                  <div
+                    className="fb-video"
+                    data-href={block.data.url}
+                    data-show-text="false"
+                  />
+                </div>
+              );
+            }
+
+            // Instagram
+            if (block.data.url.includes("instagram.com")) {
+              return (
+                <blockquote
+                  key={i}
+                  className="instagram-media my-6"
+                  data-instgrm-permalink={block.data.url}
+                />
+              );
+            }
+
+            // YouTube
+            return (
+              <iframe
+                key={i}
+                className="aspect-video w-full rounded"
+                src={toYoutubeEmbed(block.data.url)}
+                allowFullScreen
+              />
+            );
+
+          default:
+            return null;
+        }
+      })}
+    </article>
+  );
 }

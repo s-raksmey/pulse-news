@@ -30,7 +30,7 @@ export const articles: Article[] = [
     excerpt:
       "Researchers reveal a major milestone that improves translation speed and accuracy across multiple languages.",
     category: "Tech",
-    subCategory: "AI & ML",
+    subCategory: "ai-ml",
     author: authors.john,
     publishedAt: "2025-12-15T08:20:00.000Z",
     featuredImage:

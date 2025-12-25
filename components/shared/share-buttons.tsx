@@ -1,30 +1,44 @@
-// components/shared/share-buttons.tsx
 "use client";
 
-import { useMemo } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 
 interface ShareButtonsProps {
   title: string;
 }
 
 export default function ShareButtons({ title }: ShareButtonsProps) {
-  const url = useMemo(() => {
-    if (typeof window === "undefined") return "";
-    return window.location.href;
-  }, []);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  const encoded = (v: string) => encodeURIComponent(v);
+  // Build URL deterministically (no window, no effect, no state)
+  const url =
+    typeof window === "undefined"
+      ? ""
+      : `${window.location.origin}${pathname}${
+          searchParams?.toString()
+            ? `?${searchParams.toString()}`
+            : ""
+        }`;
+
+  const encodedTitle = encodeURIComponent(title);
+  const encodedUrl = encodeURIComponent(url);
 
   return (
     <div className="flex flex-wrap items-center gap-2">
       <a
         className="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-50"
-        href={`https://twitter.com/intent/tweet?text=${encoded(title)}&url=${encoded(url)}`}
+        href={
+          url
+            ? `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`
+            : "#"
+        }
         target="_blank"
         rel="noreferrer"
+        suppressHydrationWarning
       >
         Share
       </a>
+
       <button
         className="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-50"
         onClick={() => {
