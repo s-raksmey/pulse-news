@@ -1,7 +1,7 @@
 // components/home/hero-news.tsx
 
 import { getAllArticles } from "@/data/mock-articles";
-import ArticleCard from "@/components/shared/article-card";
+import ArticleCard from "@/components/news/article-card";
 
 export default function HeroNews() {
   const list = getAllArticles().filter((a) => a.category !== "Blog").slice(0, 5);

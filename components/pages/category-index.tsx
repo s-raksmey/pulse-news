@@ -2,7 +2,7 @@
 
 "use client";
 
-import ArticleCard from "@/components/shared/article-card";
+import ArticleCard from "@/components/news/article-card";
 import Breadcrumb from "@/components/shared/breadcrumb";
 import {
   getArticlesByCategory,
@@ -30,9 +30,11 @@ export default function CategoryIndex({
       <Breadcrumb
         items={[
           { label: "Home", href: "/" },
-          { label: titleCase(category), href: `/${category}` },
+          { label: titleCase(category), href: `/category/${category}` },
           ...(sub
-            ? [{ label: slugToTitle(sub), href: `/${category}/${sub}` }]
+            ? [
+                { label: slugToTitle(sub), href: `/category/${category}/${sub}` },
+              ]
             : []),
         ]}
       />

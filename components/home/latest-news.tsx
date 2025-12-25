@@ -3,7 +3,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import EditorRenderer from "@/components/editor/editor-renderer";
+import EditorRenderer from "@/components/renderer/editor-renderer";
 import type { OutputData } from "@editorjs/editorjs";
 
 /* =========================
