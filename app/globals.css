@@ -52,6 +52,9 @@
   --color-foreground: #171717;
   --color-surface: #ffffff;
   --color-surface-alt: #f9fafb;
+  --color-border: #e5e7eb;
+  --color-input: #e5e7eb;
+  --color-ring: #2563eb;
 
   /* ===== TYPOGRAPHY ===== */
   /* Font Families */
@@ -182,6 +185,9 @@
   --color-warning: var(--color-warning);
   --color-error: var(--color-error);
   --color-info: var(--color-info);
+  --color-border: var(--color-border);
+  --color-input: var(--color-input);
+  --color-ring: var(--color-ring);
 
   /* Typography */
   --font-sans: var(--font-family-sans);
@@ -607,6 +613,9 @@ body {
   --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
   --sidebar-border: hsl(240 3.7% 15.9%);
   --sidebar-ring: hsl(217.2 91.2% 59.8%);
+  --color-border: #27272a;
+  --color-input: #27272a;
+  --color-ring: hsl(217.2 91.2% 59.8%);
 }
 
 @layer base {
