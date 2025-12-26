@@ -250,9 +250,10 @@ export default function ArticleEditorPage({
               onChange={(e) => setTitle(e.target.value)}
             />
             <label className="text-xs font-semibold text-gray-600">
-              Status
+              <span className="sr-only">Status</span>
               <select
-                className="mt-1 w-full rounded border px-3 py-2 text-sm"
+                aria-label="Status"
+                className="w-full rounded border px-3 py-2 text-sm"
                 value={articleStatus}
                 onChange={(event) =>
                   setArticleStatus(event.target.value as ArticleStatus)

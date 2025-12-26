@@ -11,11 +11,13 @@ import {
 
 import {
   Sidebar,
+  SidebarHeader,
   SidebarContent,
   SidebarFooter,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarSeparator,
   SidebarRail,
 } from "@/components/ui/sidebar"
 
@@ -35,13 +37,30 @@ export default function AdminSidebar() {
   return (
     <Sidebar
       collapsible="icon"
-      className="border-none"
+      className="border-r border-neutral-200 bg-white"
     >
+      <SidebarHeader className="px-3 pt-4">
+        <div className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-900 text-xs font-semibold text-white">
+              PN
+            </div>
+            <div className="space-y-0.5">
+              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                Admin
+              </p>
+              <p className="text-sm font-semibold text-neutral-900">Pulse News Studio</p>
+            </div>
+          </div>
+        </div>
+      </SidebarHeader>
+
       {/* =========================
           MAIN NAV
       ========================= */}
-      <SidebarContent className="pt-4">
-        <SidebarMenu className="gap-3">
+      <SidebarContent className="pt-0">
+        <SidebarSeparator />
+        <SidebarMenu className="gap-2 px-2">
           {items.map((item) => {
             const Icon = item.icon
             const isActive = pathname === item.href
@@ -52,15 +71,17 @@ export default function AdminSidebar() {
                   asChild
                   isActive={isActive}
                   className="
-                    h-12
+                    h-11
                     gap-3
-                    px-5
-                    rounded-xl
+                    rounded-lg
+                    px-4
+                    text-sm
                     transition-all
+                    hover:bg-neutral-100
                   "
                 >
                   <Link href={item.href}>
-                    <Icon className="h-5 w-5 shrink-0" />
+                    <Icon className="h-4 w-4 shrink-0" />
                     <span className="truncate">
                       {item.label}
                     </span>
