@@ -20,20 +20,6 @@ export default function AdminArticlesPage() {
             </p>
           </div>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/admin/articles/new"
-            className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-md"
-          >
-            New Article
-          </Link>
-          <Link
-            href="/editor"
-            className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm transition hover:-translate-y-0.5 hover:shadow-sm"
-          >
-            Open Editor
-          </Link>
-        </div>
       </div>
 
       <div className="space-y-4">

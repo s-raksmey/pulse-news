@@ -7,7 +7,6 @@ import {
   BarChart3,
   CheckCircle2,
   Clock3,
-  FilePenLine,
   LayoutDashboard,
   PenLine,
   PlayCircle,
@@ -190,13 +189,6 @@ export default function AdminDashboard() {
               <ShieldCheck className="h-4 w-4 text-emerald-600" />
               Access Controls
             </button>
-            <Link
-              href="/editor"
-              className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
-            >
-              <FilePenLine className="h-4 w-4" />
-              New Article
-            </Link>
           </div>
         </header>
 
