@@ -11,14 +11,13 @@ import {
 
 import {
   Sidebar,
-  SidebarHeader,
   SidebarContent,
   SidebarFooter,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarSeparator,
-  SidebarRail,
+  SidebarHeader,
+  useSidebar,
 } from "@/components/ui/sidebar"
 
 /* =========================
@@ -31,26 +30,91 @@ const items = [
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ]
 
-export default function AdminSidebar() {
+function SidebarContentComponent() {
   const pathname = usePathname()
+  const { state } = useSidebar()
 
   return (
-    <Sidebar
-      collapsible="icon"
-      className="border-r border-neutral-200 bg-white"
-    >
-      <SidebarHeader className="px-3 pt-4">
-        <div className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2 shadow-sm">
+    <SidebarMenu className="gap-1 px-3">
+      {items.map((item) => {
+        const Icon = item.icon
+        const isActive = pathname === item.href || 
+          (item.href !== "/admin" && pathname?.startsWith(item.href))
+
+        return (
+          <SidebarMenuItem key={item.href}>
+            <SidebarMenuButton
+              asChild
+              isActive={isActive}
+              className="h-11 gap-3 rounded-lg px-4 text-sm transition-all hover:bg-neutral-100"
+            >
+              <Link href={item.href}>
+                <Icon className="h-4 w-4 shrink-0" />
+                {state !== "collapsed" && (
+                  <span className="truncate">{item.label}</span>
+                )}
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        )
+      })}
+    </SidebarMenu>
+  )
+}
+
+function SidebarFooterComponent() {
+  const { state } = useSidebar()
+
+  return (
+    <div className={`
+      flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-neutral-100
+      ${state === "collapsed" ? "justify-center px-2" : ""}
+    `}>
+      {/* Avatar */}
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-900 text-xs font-semibold text-white">
+        N
+      </div>
+
+      {/* User Info - Only show when sidebar is expanded */}
+      {state !== "collapsed" && (
+        <div className="flex flex-col truncate text-sm">
+          <span className="font-semibold text-neutral-900">
+            Narin Sok
+          </span>
+          <span className="truncate text-xs text-neutral-500">
+            narin.sok@pulsenews.dev
+          </span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default function AdminSidebar() {
+  const { state } = useSidebar()
+
+  return (
+    <Sidebar collapsible="icon">
+      <SidebarHeader className="px-3 pt-3">
+        <div className={`
+          flex items-center rounded-lg bg-neutral-50 px-3 py-2
+          ${state === "collapsed" ? "justify-center" : ""}
+        `}>
           <div className="flex items-center gap-3">
+            {/* Logo - Always visible */}
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-900 text-xs font-semibold text-white">
               PN
             </div>
-            <div className="space-y-0.5">
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
-                Admin
-              </p>
-              <p className="text-sm font-semibold text-neutral-900">Pulse News Studio</p>
-            </div>
+            
+            {/* Title - Only show when sidebar is expanded */}
+            {state !== "collapsed" && (
+              <div className="space-y-0.5">
+                <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                  Admin
+                </p>
+                <p className="text-sm font-semibold text-neutral-900">Pulse News Studio</p>
+              </div>
+            )}
           </div>
         </div>
       </SidebarHeader>
@@ -58,77 +122,16 @@ export default function AdminSidebar() {
       {/* =========================
           MAIN NAV
       ========================= */}
-      <SidebarContent className="pt-0">
-        <SidebarSeparator />
-        <SidebarMenu className="gap-2 px-2">
-          {items.map((item) => {
-            const Icon = item.icon
-            const isActive = pathname === item.href
-
-            return (
-              <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={isActive}
-                  className="
-                    h-11
-                    gap-3
-                    rounded-lg
-                    px-4
-                    text-sm
-                    transition-all
-                    hover:bg-neutral-100
-                  "
-                >
-                  <Link href={item.href}>
-                    <Icon className="h-4 w-4 shrink-0" />
-                    <span className="truncate">
-                      {item.label}
-                    </span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            )
-          })}
-        </SidebarMenu>
+      <SidebarContent className="pt-2 ">
+        <SidebarContentComponent />
       </SidebarContent>
 
       {/* =========================
           USER / AVATAR
       ========================= */}
       <SidebarFooter className="px-3 pb-4">
-        <div
-          className="
-            flex items-center gap-3
-            rounded-xl
-            px-3 py-2
-            transition-all
-            hover:bg-gray-100
-            data-[sidebar=collapsed]:justify-center
-            data-[sidebar=collapsed]:px-0
-          "
-        >
-          {/* Avatar */}
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-900 text-xs font-semibold text-white">
-            N
-          </div>
-
-          {/* User Info (hidden when collapsed) */}
-          <div className="flex flex-col truncate text-sm data-[sidebar=collapsed]:hidden">
-            <span className="font-semibold text-gray-900">
-              Narin Sok
-            </span>
-            <span className="truncate text-xs text-gray-500">
-              narin.sok@pulsenews.dev
-            </span>
-          </div>
-        </div>
+        <SidebarFooterComponent />
       </SidebarFooter>
-
-      {/* =========================
-          ICON RAIL (Collapsed)
-      ========================= */}
-      <SidebarRail />
     </Sidebar>
   )
 }
