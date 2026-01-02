@@ -85,6 +85,7 @@ export const Q_ARTICLE_BY_ID = /* GraphQL */ `
       excerpt
       topic
       status
+      authorName
       publishedAt
       createdAt
       updatedAt
@@ -170,4 +171,3 @@ export const M_INCREMENT_VIEW = `
     incrementArticleView(slug: $slug)
   }
 `;
-

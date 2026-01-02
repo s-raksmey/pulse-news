@@ -7,18 +7,22 @@ import {
   useRef,
 } from "react";
 
-import type { OutputData, ToolConstructable } from "@editorjs/editorjs";
+import type {
+  OutputData,
+  ToolConstructable,
+} from "@editorjs/editorjs";
 
 import Header from "@editorjs/header";
 import List from "@editorjs/list";
 import Quote from "@editorjs/quote";
 import LinkTool from "@editorjs/link";
 
-import VideoTool from "@/components/editor/video-tool";
 import HighlightTune from "@/components/editor/highlight-tune";
+import ImageTool from "@/components/editor/image-tool";
+import VideoTool from "@/components/editor/video-tool";
 
 /* =========================
-   Safe tool cast helper
+   Safe cast helper (CRITICAL)
 ========================= */
 const asTool = (tool: unknown) => tool as ToolConstructable;
 
@@ -37,8 +41,8 @@ interface NewsEditorProps {
 
 const NewsEditor = forwardRef<NewsEditorRef, NewsEditorProps>(
   ({ initialData, readOnly = false }, ref) => {
-    const editorRef = useRef<any>(null);
     const holderRef = useRef<HTMLDivElement | null>(null);
+    const editorRef = useRef<any>(null);
 
     /* ---------- Expose API ---------- */
     useImperativeHandle(ref, () => ({
@@ -50,30 +54,23 @@ const NewsEditor = forwardRef<NewsEditorRef, NewsEditorProps>(
       },
 
       clear: async () => {
-        if (!editorRef.current) {
-          throw new Error("Editor not initialized");
-        }
-        if (typeof editorRef.current.clear === "function") {
+        if (editorRef.current?.clear) {
           await editorRef.current.clear();
         }
       },
     }));
 
-    /* ---------- Init Editor (SAFE) ---------- */
+    /* ---------- Init Editor ---------- */
     useEffect(() => {
       let destroyed = false;
 
       (async () => {
-        if (!holderRef.current) return;
-        if (editorRef.current) return;
+        if (!holderRef.current || editorRef.current) return;
 
-        // ✅ CRITICAL: dynamic import
-        const EditorJSImport = await import("@editorjs/editorjs");
-        const EditorJS = EditorJSImport.default;
-
+        const { default: EditorJS } = await import("@editorjs/editorjs");
         if (!EditorJS || destroyed) return;
 
-        const editor = new EditorJS({
+        editorRef.current = new EditorJS({
           holder: holderRef.current,
           readOnly,
           autofocus: true,
@@ -82,22 +79,23 @@ const NewsEditor = forwardRef<NewsEditorRef, NewsEditorProps>(
           data: initialData ?? { blocks: [] },
 
           tools: {
-            highlight: asTool(HighlightTune),
+            /* ---------- Tune ---------- */
+            highlight: HighlightTune as any,
 
+            /* ---------- Text ---------- */
             paragraph: {
               inlineToolbar: true,
               tunes: ["highlight"],
             },
 
             header: {
-              class: asTool(Header),
+              class: asTool(Header), // ✅ FIXES TS2322
               inlineToolbar: true,
+              tunes: ["highlight"],
               config: {
-                placeholder: "Section heading",
                 levels: [2, 3, 4],
                 defaultLevel: 2,
               },
-              tunes: ["highlight"],
             },
 
             list: {
@@ -112,11 +110,19 @@ const NewsEditor = forwardRef<NewsEditorRef, NewsEditorProps>(
               tunes: ["highlight"],
             },
 
-            video: {
-              class: asTool(VideoTool),
-              inlineToolbar: true,
+            /* ---------- Image ---------- */
+            image: {
+              class: ImageTool as any,
+              tunes: ["highlight"],
             },
 
+            /* ---------- Video ---------- */
+            video: {
+              class: VideoTool as any,
+              tunes: ["highlight"],
+            },
+
+            /* ---------- Link ---------- */
             linkTool: {
               class: asTool(LinkTool),
               config: {
@@ -125,23 +131,14 @@ const NewsEditor = forwardRef<NewsEditorRef, NewsEditorProps>(
             },
           },
         });
-
-        editorRef.current = editor;
       })();
 
       return () => {
         destroyed = true;
-
-        // ✅ SAFE destroy
-        const ed = editorRef.current;
-        if (ed && typeof ed.destroy === "function") {
-          ed.destroy();
-        }
-
+        editorRef.current?.destroy?.();
         editorRef.current = null;
       };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [initialData, readOnly]);
 
     return (
       <div className="rounded-md border bg-white p-3">
