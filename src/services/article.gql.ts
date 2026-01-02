@@ -16,7 +16,7 @@ export const Q_CATEGORIES = /* GraphQL */ `
    Articles list
 ========================= */
 
-export const Q_ARTICLES = /* GraphQL */ `
+export const Q_ARTICLES = `
   query Articles(
     $status: ArticleStatus
     $categorySlug: String
@@ -38,6 +38,9 @@ export const Q_ARTICLES = /* GraphQL */ `
       status
       topic
       publishedAt
+      viewCount
+      isFeatured
+      isEditorsPick
       category {
         name
         slug

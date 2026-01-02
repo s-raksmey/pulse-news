@@ -8,30 +8,24 @@ import { Q_ARTICLES } from "@/services/article.gql";
 export const revalidate = 60;
 
 /* -------------------------
-   SSG
+   SSG (ONLY VALID TOPICS)
 ------------------------- */
 export async function generateStaticParams() {
   const params: { category: string; topic: string }[] = [];
 
   for (const category of Object.keys(MEGA_NAV)) {
     const cfg = MEGA_NAV[category];
-    const sections = [cfg.explore, cfg.shop, cfg.more];
+    const sections = [cfg.explore, cfg.shop]; // ❗ FIXED
 
     for (const section of sections) {
       for (const item of section.items) {
-        const match = item.href.match(
-          /^\/category\/([^/]+)\/([^/]+)$/
-        );
+        const match = item.href.match(/^\/category\/([^/]+)\/([^/]+)$/);
         if (match) {
-          params.push({
-            category: match[1],
-            topic: match[2],
-          });
+          params.push({ category: match[1], topic: match[2] });
         }
       }
     }
 
-    // ensure "latest"
     params.push({ category, topic: "latest" });
   }
 
@@ -48,7 +42,6 @@ export default async function TopicPage({
 }: {
   params: Promise<{ category: string; topic: string }>;
 }) {
-  // ✅ REQUIRED IN NEXT 15
   const { category, topic } = await params;
 
   const nav = MEGA_NAV[category];
@@ -64,50 +57,52 @@ export default async function TopicPage({
   });
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10 space-y-6">
-      {/* Breadcrumb */}
-      <nav className="text-sm text-slate-500">
-        <Link href="/">Home</Link>
-        <span className="mx-2">/</span>
-        <Link href={`/category/${category}`}>
-          {nav.root.label}
-        </Link>
-        <span className="mx-2">/</span>
-        <span className="capitalize">
-          {topic === "latest" ? "Latest" : topic}
-        </span>
-      </nav>
+    <main className="mx-auto max-w-7xl px-4 py-12">
+      {/* Header */}
+      <header className="mb-10">
+        <nav className="text-xs uppercase tracking-wide text-slate-500 mb-2">
+          <Link href="/">Home</Link> /{" "}
+          <Link href={`/category/${category}`}>{nav.root.label}</Link> /{" "}
+          <span className="capitalize">
+            {topic === "latest" ? "Latest" : topic}
+          </span>
+        </nav>
 
-      <header>
-        <h1 className="text-2xl font-bold capitalize">
+        <h1 className="text-4xl font-bold capitalize">
           {topic === "latest" ? "Latest" : topic}
         </h1>
-        <p className="text-sm text-slate-600">
-          {nav.root.label}
+        <p className="text-slate-600 mt-2">
+          {nav.root.label} coverage and analysis
         </p>
       </header>
 
-      <ul className="space-y-3">
+      {/* Grid */}
+      <section className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {articles.map((a: any) => (
-          <li
+          <article
             key={a.id}
-            className="rounded-lg border bg-white p-4 hover:bg-slate-50"
+            className="group rounded-xl border bg-white p-6 hover:shadow-lg transition"
           >
             <Link href={`/news/${a.slug}`}>
-              <div className="font-semibold">{a.title}</div>
-              <div className="text-sm text-slate-600 line-clamp-2">
+              <h2 className="text-lg font-semibold group-hover:underline">
+                {a.title}
+              </h2>
+              <p className="mt-2 text-sm text-slate-600 line-clamp-3">
                 {a.excerpt ?? "—"}
+              </p>
+              <div className="mt-4 text-xs text-slate-400">
+                {a.category?.name}
               </div>
             </Link>
-          </li>
+          </article>
         ))}
+      </section>
 
-        {articles.length === 0 && (
-          <li className="text-sm text-slate-600">
-            No articles for this topic yet.
-          </li>
-        )}
-      </ul>
+      {articles.length === 0 && (
+        <p className="text-sm text-slate-500 mt-10">
+          No articles yet.
+        </p>
+      )}
     </main>
   );
 }
