@@ -4,7 +4,8 @@ import type {
 } from "@editorjs/editorjs";
 
 type VideoData = {
-  url?: string;
+  source?: string; // original URL
+  embed?: string;  // iframe-ready URL
 };
 
 export default class VideoTool implements BlockTool {
@@ -28,7 +29,7 @@ export default class VideoTool implements BlockTool {
     this.wrapper.innerHTML = "";
 
     /* ---------- INPUT MODE ---------- */
-    if (!this.data.url && !this.loading) {
+    if (!this.data.embed && !this.loading) {
       const input = document.createElement("input");
       input.type = "url";
       input.placeholder =
@@ -37,20 +38,15 @@ export default class VideoTool implements BlockTool {
         "w-full rounded-md border px-3 py-2 text-sm";
 
       input.addEventListener("paste", () => {
-        // Allow paste event to complete
         setTimeout(() => {
           const value = input.value.trim();
-          if (!value) return;
-
-          this.startProcessing(value);
+          if (value) this.startProcessing(value);
         }, 0);
       });
 
       input.addEventListener("change", () => {
         const value = input.value.trim();
-        if (!value) return;
-
-        this.startProcessing(value);
+        if (value) this.startProcessing(value);
       });
 
       this.wrapper.appendChild(input);
@@ -64,24 +60,11 @@ export default class VideoTool implements BlockTool {
         "flex items-center gap-2 rounded-md border px-3 py-2 text-sm text-slate-600";
 
       loading.innerHTML = `
-        <svg
-          class="animate-spin h-4 w-4 text-slate-500"
-          viewBox="0 0 24 24"
-          fill="none"
-        >
-          <circle
-            class="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            stroke-width="4"
-          />
-          <path
-            class="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-          />
+        <svg class="animate-spin h-4 w-4 text-slate-500" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10"
+            stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor"
+            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
         </svg>
         <span>Processing video…</span>
       `;
@@ -91,14 +74,19 @@ export default class VideoTool implements BlockTool {
     }
 
     /* ---------- VIDEO MODE ---------- */
-    const iframe = document.createElement("iframe");
-    iframe.src = this.toEmbedUrl(this.data.url!) || "";
-    iframe.className = "w-full aspect-video rounded-lg";
-    iframe.allow =
-      "autoplay; encrypted-media; fullscreen; picture-in-picture";
-    iframe.allowFullscreen = true;
+    if (this.data.embed) {
+      const iframe = document.createElement("iframe");
+      iframe.src = this.data.embed;
+      iframe.className =
+        "w-full aspect-video rounded-lg border";
+      iframe.allow =
+        "autoplay; encrypted-media; fullscreen; picture-in-picture";
+      iframe.allowFullscreen = true;
+      iframe.loading = "lazy";
 
-    this.wrapper.appendChild(iframe);
+      this.wrapper.appendChild(iframe);
+    }
+
     return this.wrapper;
   }
 
@@ -116,12 +104,15 @@ export default class VideoTool implements BlockTool {
     this.loading = true;
     this.render();
 
-    // Simulate async validation / oEmbed fetch
+    // Simulate async processing
     setTimeout(() => {
-      this.data.url = url;
+      this.data = {
+        source: url,
+        embed,
+      };
       this.loading = false;
       this.render();
-    }, 700); // 👈 UX-friendly delay
+    }, 500);
   }
 
   /* -------------------------
@@ -129,7 +120,7 @@ export default class VideoTool implements BlockTool {
   ------------------------- */
   private toEmbedUrl(url: string): string | null {
     try {
-      // YouTube (short)
+      // YouTube short
       if (url.includes("youtu.be/")) {
         const id = url.split("youtu.be/")[1]?.split(/[?&]/)[0];
         return id
@@ -137,7 +128,7 @@ export default class VideoTool implements BlockTool {
           : null;
       }
 
-      // YouTube (long)
+      // YouTube long
       if (url.includes("youtube.com")) {
         const id = new URL(url).searchParams.get("v");
         return id

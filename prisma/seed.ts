@@ -1,20 +1,63 @@
 import { PrismaClient, ArticleStatus } from "@prisma/client";
+import { MEGA_NAV } from "../src/data/mega-nav.js"; // ✅ ESM requires .js
 
 const prisma = new PrismaClient();
 
+/* =========================
+   Helpers
+========================= */
+
+/**
+ * Extract valid topic slugs from MEGA_NAV
+ * - ignores "latest"
+ * - fully type-safe (string[])
+ */
+function extractTopics(categorySlug: string): string[] {
+  const cfg = MEGA_NAV[categorySlug];
+  if (!cfg) return [];
+
+  const allItems = [
+    ...cfg.explore.items,
+    ...cfg.shop.items,
+  ];
+
+  return Array.from(
+    new Set(
+      allItems
+        .map((i) => i.href.split("/").pop())
+        .filter(
+          (t): t is string =>
+            typeof t === "string" && t.length > 0 && t !== "latest"
+        )
+    )
+  );
+}
+
+/* =========================
+   Seed
+========================= */
 async function main() {
-  const world = await prisma.category.upsert({
-    where: { slug: "world" },
-    update: {},
-    create: { name: "World", slug: "world" },
-  });
+  console.log("🌱 Seeding categories from MEGA_NAV...");
 
-  const tech = await prisma.category.upsert({
-    where: { slug: "tech" },
-    update: {},
-    create: { name: "Tech", slug: "tech" },
-  });
+  const categoryMap: Record<string, string> = {};
 
+  /* ---------- Categories ---------- */
+  for (const slug of Object.keys(MEGA_NAV)) {
+    const category = await prisma.category.upsert({
+      where: { slug },
+      update: {},
+      create: {
+        slug,
+        name: MEGA_NAV[slug].root.label,
+      },
+    });
+
+    categoryMap[slug] = category.id;
+  }
+
+  console.log("✅ Categories seeded");
+
+  /* ---------- Sample Article (Tech) ---------- */
   await prisma.article.upsert({
     where: { slug: "welcome-to-pulse-news" },
     update: {},
@@ -24,20 +67,43 @@ async function main() {
       excerpt: "A starter article seeded into PostgreSQL via Prisma.",
       status: ArticleStatus.PUBLISHED,
       publishedAt: new Date(),
-      categoryId: tech.id,
+      categoryId: categoryMap["tech"],
+      topic: extractTopics("tech")[0] ?? null,
       contentJson: {
         time: Date.now(),
         blocks: [
           { type: "header", data: { text: "Pulse News", level: 2 } },
-          { type: "paragraph", data: { text: "This article is rendered from Editor.js JSON blocks." } },
-          { type: "quote", data: { text: "Build fast. Ship safely.", caption: "Pulse Team" } },
-          { type: "list", data: { style: "unordered", items: ["Next.js App Router", "GraphQL API", "PostgreSQL + Prisma"] } }
+          {
+            type: "paragraph",
+            data: {
+              text: "This article is rendered from Editor.js JSON blocks.",
+            },
+          },
+          {
+            type: "quote",
+            data: {
+              text: "Build fast. Ship safely.",
+              caption: "Pulse Team",
+            },
+          },
+          {
+            type: "list",
+            data: {
+              style: "unordered",
+              items: [
+                "Next.js App Router",
+                "GraphQL API",
+                "PostgreSQL + Prisma",
+              ],
+            },
+          },
         ],
-        version: "2.30.2"
-      }
+        version: "2.30.2",
+      },
     },
   });
 
+  /* ---------- Sample Article (World) ---------- */
   await prisma.article.upsert({
     where: { slug: "world-briefing-sample" },
     update: {},
@@ -47,23 +113,35 @@ async function main() {
       excerpt: "Sample article in the World category.",
       status: ArticleStatus.PUBLISHED,
       publishedAt: new Date(),
-      categoryId: world.id,
+      categoryId: categoryMap["world"],
+      topic: extractTopics("world")[0] ?? null,
       contentJson: {
         time: Date.now(),
         blocks: [
           { type: "header", data: { text: "World Briefing", level: 2 } },
-          { type: "paragraph", data: { text: "This is a sample World article. Replace it with real reporting." } }
+          {
+            type: "paragraph",
+            data: {
+              text: "This is a sample World article. Replace it with real reporting.",
+            },
+          },
         ],
-        version: "2.30.2"
-      }
+        version: "2.30.2",
+      },
     },
   });
+
+  console.log("✅ Sample articles seeded");
 }
 
+/* =========================
+   Run
+========================= */
 main()
-  .then(async () => prisma.$disconnect())
-  .catch(async (e) => {
-    console.error(e);
-    await prisma.$disconnect();
+  .catch((e) => {
+    console.error("❌ Seed failed:", e);
     process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
   });

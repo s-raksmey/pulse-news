@@ -22,10 +22,9 @@ import type { NewsEditorRef } from "@/components/editor/news-editor";
 /* -------------------------
    Editor (client-only)
 ------------------------- */
-const NewsEditor = dynamic(
-  () => import("@/components/editor/news-editor"),
-  { ssr: false }
-);
+const NewsEditor = dynamic(() => import("@/components/editor/news-editor"), {
+  ssr: false,
+});
 
 /* -------------------------
    Helpers
@@ -69,8 +68,9 @@ export default function EditArticlePage() {
   );
   const [topic, setTopic] = useState<string>("");
 
-  const [status, setStatus] =
-    useState<"DRAFT" | "PUBLISHED" | "ARCHIVED">("DRAFT");
+  const [status, setStatus] = useState<"DRAFT" | "PUBLISHED" | "ARCHIVED">(
+    "DRAFT"
+  );
 
   /** Editor initial content (ONE TIME) */
   const [initialContent, setInitialContent] = useState<OutputData>({
@@ -79,12 +79,26 @@ export default function EditArticlePage() {
 
   /** Stable derived data */
   const categoryOptions = useMemo(() => Object.keys(MEGA_NAV), []);
-  const topicOptions = categorySlug
-    ? MEGA_NAV[categorySlug].explore.items
-        .map((i) => i.href.split("/").pop())
-        .filter((t): t is string => Boolean(t))
-    : [];
+  const topicOptions = useMemo(() => {
+    if (!categorySlug) return [];
 
+    const cfg = MEGA_NAV[categorySlug];
+    if (!cfg) return [];
+
+    const allItems = [
+      ...cfg.explore.items,
+      ...cfg.shop.items,
+      ...cfg.more.items,
+    ];
+
+    return Array.from(
+      new Set(
+        allItems
+          .map((i) => i.href.split("/").pop())
+          .filter((t): t is string => Boolean(t))
+      )
+    );
+  }, [categorySlug]);
   /* -------------------------
      Load article
   ------------------------- */
@@ -120,8 +134,7 @@ export default function EditArticlePage() {
   async function save() {
     setSaving(true);
     try {
-      const contentJson =
-        (await editorRef.current?.save()) ?? { blocks: [] };
+      const contentJson = (await editorRef.current?.save()) ?? { blocks: [] };
 
       await client.request(M_UPSERT_ARTICLE, {
         id,
@@ -231,7 +244,9 @@ export default function EditArticlePage() {
         </div>
 
         <div className="grid gap-2">
-          <label className="text-xs font-semibold text-slate-600">Excerpt</label>
+          <label className="text-xs font-semibold text-slate-600">
+            Excerpt
+          </label>
           <Input value={excerpt} onChange={(e) => setExcerpt(e.target.value)} />
         </div>
 
@@ -281,9 +296,7 @@ export default function EditArticlePage() {
             className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm"
             value={status}
             onChange={(e) =>
-              setStatus(
-                e.target.value as "DRAFT" | "PUBLISHED" | "ARCHIVED"
-              )
+              setStatus(e.target.value as "DRAFT" | "PUBLISHED" | "ARCHIVED")
             }
           >
             <option value="DRAFT">DRAFT</option>

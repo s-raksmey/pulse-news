@@ -7,24 +7,15 @@ import { Q_ARTICLES } from "@/services/article.gql";
 
 export const revalidate = 60;
 
-/* -------------------------
-   SSG
-------------------------- */
 export async function generateStaticParams() {
-  return Object.keys(MEGA_NAV).map((category) => ({
-    category,
-  }));
+  return Object.keys(MEGA_NAV).map(category => ({ category }));
 }
 
-/* -------------------------
-   Page
-------------------------- */
 export default async function CategoryPage({
   params,
 }: {
   params: Promise<{ category: string }>;
 }) {
-  // ✅ REQUIRED IN NEXT 15
   const { category } = await params;
 
   const nav = MEGA_NAV[category];
@@ -34,43 +25,38 @@ export default async function CategoryPage({
   const { articles } = await client.request(Q_ARTICLES, {
     status: "PUBLISHED",
     categorySlug: category,
-    topic: null,
     take: 30,
     skip: 0,
   });
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10 space-y-6">
-      <header>
-        <h1 className="text-2xl font-bold">
-          {nav.root.label}
-        </h1>
-        <p className="text-sm text-slate-600">
-          Latest articles
-        </p>
+    <main className="mx-auto max-w-7xl px-4 py-12">
+      <header className="mb-10">
+        <h1 className="text-4xl font-bold">{nav.root.label}</h1>
+        <p className="text-slate-600 mt-2">Latest stories</p>
       </header>
 
-      <ul className="space-y-3">
+      <section className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {articles.map((a: any) => (
-          <li
+          <article
             key={a.id}
-            className="rounded-lg border bg-white p-4 hover:bg-slate-50"
+            className="rounded-xl border bg-white p-6 hover:shadow-lg transition"
           >
             <Link href={`/news/${a.slug}`}>
-              <div className="font-semibold">{a.title}</div>
-              <div className="text-sm text-slate-600 line-clamp-2">
+              <h2 className="font-semibold">{a.title}</h2>
+              <p className="mt-2 text-sm text-slate-600 line-clamp-3">
                 {a.excerpt ?? "—"}
-              </div>
+              </p>
             </Link>
-          </li>
+          </article>
         ))}
+      </section>
 
-        {articles.length === 0 && (
-          <li className="text-sm text-slate-600">
-            No articles yet.
-          </li>
-        )}
-      </ul>
+      {articles.length === 0 && (
+        <p className="text-sm text-slate-500 mt-10">
+          No articles yet.
+        </p>
+      )}
     </main>
   );
 }

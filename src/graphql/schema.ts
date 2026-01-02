@@ -89,7 +89,7 @@ export const schema = createSchema({
       excerpt: String
       status: ArticleStatus!
       topic: String
-      contentJson: JSON!
+      contentJson: JSON
 
       coverImageUrl: String
       authorName: String
@@ -97,17 +97,17 @@ export const schema = createSchema({
       seoDescription: String
       ogImageUrl: String
 
-      isFeatured: Boolean!
-      isEditorsPick: Boolean!
+      isFeatured: Boolean
+      isEditorsPick: Boolean
       pinnedAt: String
-      viewCount: Int!
+      viewCount: Int
 
       publishedAt: String
       createdAt: String!
       updatedAt: String!
 
       category: Category
-      tags: [Tag!]!
+      tags: [Tag!]
     }
 
     input UpsertArticleInput {
@@ -330,14 +330,34 @@ export const schema = createSchema({
           categoryId: category?.id ?? null,
         };
 
-        const article = id
-          ? await db.article.update({ where: { id }, data: payload })
-          : await db.article.create({
+        let article;
+
+        if (id) {
+          // update by ID (edit page)
+          article = await db.article.update({
+            where: { id },
+            data: payload,
+          });
+        } else {
+          // create OR update by slug (new page / retry-safe)
+          const existing = await db.article.findUnique({
+            where: { slug: data.slug },
+          });
+
+          if (existing) {
+            article = await db.article.update({
+              where: { id: existing.id },
+              data: payload,
+            });
+          } else {
+            article = await db.article.create({
               data: {
                 ...payload,
                 publishedAt: status === "PUBLISHED" ? new Date() : null,
               },
             });
+          }
+        }
 
         // tags
         if (data.tagSlugs) {
