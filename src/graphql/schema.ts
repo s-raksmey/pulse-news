@@ -157,6 +157,7 @@ export const schema = createSchema({
       upsertArticle(id: ID, input: UpsertArticleInput!): Article!
       setArticleStatus(id: ID!, status: ArticleStatus!): Article!
       incrementArticleView(slug: String!): Boolean!
+      deleteArticle(id: ID!): Boolean!
     }
   `,
 
@@ -273,7 +274,9 @@ export const schema = createSchema({
 
         if (!article) return [];
 
-        const tagIds = (article.tags ?? []).map((t: any) => t.tagId).filter(Boolean);
+        const tagIds = (article.tags ?? [])
+          .map((t: any) => t.tagId)
+          .filter(Boolean);
         if (!tagIds.length) return [];
 
         return db.article.findMany({
@@ -307,7 +310,11 @@ export const schema = createSchema({
           excerpt: data.excerpt ?? null,
           status,
           topic: data.topic ?? null,
-          contentJson: data.contentJson ?? { time: Date.now(), blocks: [], version: "2.x" },
+          contentJson: data.contentJson ?? {
+            time: Date.now(),
+            blocks: [],
+            version: "2.x",
+          },
 
           isFeatured: data.isFeatured ?? false,
           isEditorsPick: data.isEditorsPick ?? false,
@@ -373,6 +380,21 @@ export const schema = createSchema({
           where: { slug },
           data: { viewCount: { increment: 1 } },
         });
+        return true;
+      },
+
+      deleteArticle: async (_: unknown, { id }: { id: string }) => {
+        const article = await db.article.findUnique({ where: { id } });
+        if (!article) return false;
+
+        await db.articleTag.deleteMany({
+          where: { articleId: id },
+        });
+
+        await db.article.delete({
+          where: { id },
+        });
+
         return true;
       },
     },

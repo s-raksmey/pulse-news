@@ -12,10 +12,22 @@
   --primary-foreground: 210 40% 98%;
 }
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
 body {
   @apply bg-white text-slate-900 antialiased;
+}
+
+.editor-highlight {
+  background: #fff7ed;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+}
+
+img {
+  image-rendering: auto;
+  -webkit-font-smoothing: antialiased;
 }
