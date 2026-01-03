@@ -41,6 +41,15 @@ const ArticleInput = z.object({
   pinnedAt: z.string().optional().nullable(),
 });
 
+const TopicInput = z.object({
+  categorySlug: z.string().min(1),
+  slug: z.string().min(1),
+  title: z.string().min(2),
+  description: z.string().optional().nullable(),
+  coverImageUrl: z.string().url().optional().nullable(),
+  coverVideoUrl: z.string().optional().nullable(),
+});
+
 function toIso(d?: Date | null): string | null {
   return d ? d.toISOString() : null;
 }
@@ -151,6 +160,8 @@ export const schema = createSchema({
       latestByCategory(categorySlug: String!, limit: Int = 6): [Article!]!
       trending(limit: Int = 10): [Article!]!
       relatedArticles(slug: String!, limit: Int = 6): [Article!]!
+      topicBySlug(categorySlug: String!, topicSlug: String!): Topic
+      topicsByCategory(categorySlug: String!): [Topic!]!
     }
 
     type Mutation {
@@ -158,6 +169,29 @@ export const schema = createSchema({
       setArticleStatus(id: ID!, status: ArticleStatus!): Article!
       incrementArticleView(slug: String!): Boolean!
       deleteArticle(id: ID!): Boolean!
+      upsertTopic(id: ID, input: UpsertTopicInput!): Topic!
+      deleteTopic(id: ID!): Boolean!
+    }
+
+    type Topic {
+      id: ID!
+      slug: String!
+      title: String!
+      description: String
+      coverImageUrl: String
+      coverVideoUrl: String
+      createdAt: String!
+      updatedAt: String!
+      category: Category!
+    }
+
+    input UpsertTopicInput {
+      categorySlug: String!
+      slug: String!
+      title: String!
+      description: String
+      coverImageUrl: String
+      coverVideoUrl: String
     }
   `,
 
@@ -194,6 +228,17 @@ export const schema = createSchema({
       },
     },
 
+    Topic: {
+      createdAt: (p: any) => toIso(p.createdAt),
+      updatedAt: (p: any) => toIso(p.updatedAt),
+
+      category: async (parent: any) => {
+        return db.category.findUnique({
+          where: { id: parent.categoryId },
+        });
+      },
+    },
+
     Query: {
       categories: async () =>
         db.category.findMany({ orderBy: { name: "asc" } }),
@@ -213,6 +258,29 @@ export const schema = createSchema({
           orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
           take: args.take ?? 20,
           skip: args.skip ?? 0,
+          select: {
+            // MAKE SURE contentJson is included
+            id: true,
+            title: true,
+            slug: true,
+            excerpt: true,
+            status: true,
+            topic: true,
+            contentJson: true, // <-- THIS IS CRITICAL
+            coverImageUrl: true,
+            authorName: true,
+            seoTitle: true,
+            seoDescription: true,
+            ogImageUrl: true,
+            isFeatured: true,
+            isEditorsPick: true,
+            pinnedAt: true,
+            viewCount: true,
+            publishedAt: true,
+            createdAt: true,
+            updatedAt: true,
+            categoryId: true,
+          },
         });
       },
 
@@ -287,6 +355,42 @@ export const schema = createSchema({
           },
           orderBy: { publishedAt: "desc" },
           take: limit ?? 6,
+        });
+      },
+
+      topicBySlug: async (
+        _: unknown,
+        { categorySlug, topicSlug }: { categorySlug: string; topicSlug: string }
+      ) => {
+        const category = await db.category.findUnique({
+          where: { slug: categorySlug },
+          select: { id: true },
+        });
+
+        if (!category) return null;
+
+        return db.topic.findFirst({
+          where: {
+            categoryId: category.id,
+            slug: topicSlug,
+          },
+        });
+      },
+
+      topicsByCategory: async (
+        _: unknown,
+        { categorySlug }: { categorySlug: string }
+      ) => {
+        const category = await db.category.findUnique({
+          where: { slug: categorySlug },
+          select: { id: true },
+        });
+
+        if (!category) return [];
+
+        return db.topic.findMany({
+          where: { categoryId: category.id },
+          orderBy: { title: "asc" },
         });
       },
     },
@@ -415,6 +519,52 @@ export const schema = createSchema({
           where: { id },
         });
 
+        return true;
+      },
+
+      upsertTopic: async (_: unknown, { id, input }: any) => {
+        const data = TopicInput.parse(input);
+
+        const category = await db.category.findUnique({
+          where: { slug: data.categorySlug },
+          select: { id: true },
+        });
+
+        if (!category) throw new Error("Category not found");
+
+        const payload = {
+          slug: data.slug,
+          title: data.title,
+          description: data.description ?? null,
+          coverImageUrl: data.coverImageUrl ?? null,
+          coverVideoUrl: data.coverVideoUrl ?? null,
+          categoryId: category.id,
+        };
+
+        if (id) {
+          return db.topic.update({
+            where: { id },
+            data: payload,
+          });
+        }
+
+        return db.topic.upsert({
+          where: {
+            categoryId_slug: {
+              categoryId: category.id,
+              slug: data.slug,
+            },
+          },
+          update: payload,
+          create: payload,
+        });
+      },
+
+      deleteTopic: async (_: unknown, { id }: { id: string }) => {
+        const topic = await db.topic.findUnique({ where: { id } });
+        if (!topic) return false;
+
+        await db.topic.delete({ where: { id } });
         return true;
       },
     },
