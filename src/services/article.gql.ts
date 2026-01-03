@@ -16,7 +16,7 @@ export const Q_CATEGORIES = /* GraphQL */ `
    Articles list
 ========================= */
 
-export const Q_ARTICLES = `
+export const Q_ARTICLES = /* GraphQL */ `
   query Articles(
     $status: ArticleStatus
     $categorySlug: String
@@ -41,6 +41,9 @@ export const Q_ARTICLES = `
       viewCount
       isFeatured
       isEditorsPick
+      coverImageUrl
+      ogImageUrl
+      contentJson 
       category {
         name
         slug
@@ -53,9 +56,35 @@ export const Q_ARTICLES = `
    Article by slug (public)
 ========================= */
 
-export const Q_ARTICLE_BY_SLUG = /* GraphQL */ `
-  query ArticleBySlug($slug: String!) {
-    articleBySlug(slug: $slug) {
+export const Q_ARTICLES_BY_TOPIC = /* GraphQL */ `
+  query ArticlesByTopic($categorySlug: String!, $topicSlug: String!) {
+    articlesByTopic(categorySlug: $categorySlug, topicSlug: $topicSlug) {
+      id
+      title
+      slug
+      excerpt
+      topic
+      status
+      authorName
+      publishedAt
+      createdAt
+      updatedAt
+      contentJson
+      category {
+        name
+        slug
+      }
+    }
+  }
+`;
+
+/* =========================
+   Article by ID (CMS)
+========================= */
+
+export const Q_ARTICLE_BY_ID = /* GraphQL */ `
+  query ArticleById($id: ID!) {
+    articleById(id: $id) {
       id
       title
       slug
@@ -75,13 +104,9 @@ export const Q_ARTICLE_BY_SLUG = /* GraphQL */ `
   }
 `;
 
-/* =========================
-   Article by ID (CMS)
-========================= */
-
-export const Q_ARTICLE_BY_ID = /* GraphQL */ `
-  query ArticleById($id: ID!) {
-    articleById(id: $id) {
+export const Q_ARTICLE_BY_SLUG = /* GraphQL */ `
+  query ArticleBySlug($slug: String!) {
+    articleBySlug(slug: $slug) {
       id
       title
       slug
@@ -135,42 +160,76 @@ export const M_SET_STATUS = /* GraphQL */ `
   }
 `;
 
-/* =========================
-   ❗ Delete Article (FIXED)
-========================= */
-
 export const M_DELETE_ARTICLE = /* GraphQL */ `
   mutation DeleteArticle($id: ID!) {
     deleteArticle(id: $id)
   }
 `;
 
-export const Q_TOP_STORIES = `
+/* =========================
+   Home sections (UPDATED)
+========================= */
+
+export const Q_TOP_STORIES = /* GraphQL */ `
   query {
     topStories {
-      id title slug excerpt category { name }
+      id
+      title
+      slug
+      excerpt
+      topic
+      contentJson
+      category { name slug }
     }
   }
 `;
 
-export const Q_EDITORS_PICKS = `
+export const Q_EDITORS_PICKS = /* GraphQL */ `
   query {
     editorsPicks {
-      id title slug excerpt category { name }
+      id
+      title
+      slug
+      excerpt
+      topic
+      contentJson
+      category { name slug }
     }
   }
 `;
 
-export const Q_TRENDING = `
+export const Q_TRENDING = /* GraphQL */ `
   query {
     trending {
-      id title slug category { name }
+      id
+      title
+      slug
+      topic
+      contentJson
+      category { name slug }
     }
   }
 `;
 
-export const M_INCREMENT_VIEW = `
+export const M_INCREMENT_VIEW = /* GraphQL */ `
   mutation ($slug: String!) {
     incrementArticleView(slug: $slug)
+  }
+`;
+
+export const Q_TOPIC_BY_SLUG = /* GraphQL */ `
+  query TopicBySlug($categorySlug: String!, $topicSlug: String!) {
+    topicBySlug(categorySlug: $categorySlug, topicSlug: $topicSlug) {
+      id
+      slug
+      title
+      description
+      coverImageUrl
+      coverVideoUrl
+      category {
+        name
+        slug
+      }
+    }
   }
 `;
