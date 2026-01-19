@@ -84,6 +84,18 @@ export default function HomePageClient({
     },
   ];
 
+  // Helper function to generate deterministic values based on article ID
+  const generateDeterministicValue = (id: string, seed: number, min: number, max: number) => {
+    let hash = 0;
+    const str = id + seed.toString();
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash) % (max - min + 1) + min;
+  };
+
   // Transform articles for new components
   const transformedArticles = (articles: Article[]) => 
     articles.map(a => ({
@@ -106,9 +118,9 @@ export default function HomePageClient({
       } : undefined,
       topic: a.topic || "latest",
       publishedAt: a.publishedAt,
-      readTime: a.readTime || Math.floor(Math.random() * 10) + 3,
-      views: Math.floor(Math.random() * 10000) + 1000,
-      commentsCount: Math.floor(Math.random() * 50),
+      readTime: a.readTime || generateDeterministicValue(a.id, 1, 3, 12),
+      views: generateDeterministicValue(a.id, 2, 1000, 10000),
+      commentsCount: generateDeterministicValue(a.id, 3, 0, 50),
     }));
 
   const featuredArticles = transformedArticles(topStories.slice(0, 5));
