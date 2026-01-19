@@ -4,6 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
+import BreakingNewsBanner from "./breaking-news-banner";
+import HeroSection from "./hero-section";
+import Sidebar from "@/components/layout/sidebar";
+import ArticleCardLarge from "@/components/article/article-card-large";
 
 type Article = any;
 
@@ -48,7 +52,6 @@ const stagger: Variants = {
   show: {
     transition: {
       staggerChildren: 0.08,
-      delayChildren: 0.12,
     },
   },
 };
@@ -65,166 +68,139 @@ export default function HomePageClient({
   editorsPicks: Article[];
   trending: Article[];
 }) {
-  const hero = topStories[0];
-  const secondary = topStories.slice(1, 6);
+  // Mock breaking news data - replace with actual data
+  const breakingNews = [
+    {
+      id: "1",
+      title: "Breaking: Major Economic Summit Reaches Historic Agreement",
+      url: "/world/latest/economic-summit",
+      timestamp: new Date().toISOString(),
+    },
+    {
+      id: "2", 
+      title: "Tech Giant Announces Revolutionary AI Breakthrough",
+      url: "/tech/latest/ai-breakthrough",
+      timestamp: new Date().toISOString(),
+    },
+  ];
+
+  // Transform articles for new components
+  const transformedArticles = (articles: Article[]) => 
+    articles.map(a => ({
+      id: a.id,
+      title: a.title,
+      excerpt: a.excerpt,
+      slug: a.slug,
+      coverImage: a.coverImage ? {
+        url: a.coverImage.url,
+        alt: a.title,
+      } : undefined,
+      author: a.author ? {
+        name: a.author.name,
+        avatar: a.author.avatar,
+      } : undefined,
+      category: a.category ? {
+        name: a.category.name,
+        slug: a.category.slug,
+        color: a.category.color || "#3B82F6",
+      } : undefined,
+      topic: a.topic || "latest",
+      publishedAt: a.publishedAt,
+      readTime: a.readTime || Math.floor(Math.random() * 10) + 3,
+      views: Math.floor(Math.random() * 10000) + 1000,
+      commentsCount: Math.floor(Math.random() * 50),
+    }));
+
+  const featuredArticles = transformedArticles(topStories.slice(0, 5));
+  const editorPicksTransformed = transformedArticles(editorsPicks);
+  const trendingTransformed = transformedArticles(trending);
 
   return (
-    <main className="mx-auto max-w-7xl px-6 py-10 space-y-20">
-      {/* ================= HERO + TOP STORIES ================= */}
-      {hero && (
-        <motion.section
-          variants={stagger}
-          initial="hidden"
-          animate="show"
-          className="grid gap-10 lg:grid-cols-12"
-        >
-          {/* Hero */}
-          <motion.div variants={fadeUp} className="lg:col-span-8">
-            <Link
-              href={articleUrl(hero)}
-              className="relative block overflow-hidden rounded-3xl bg-slate-950 text-white"
-            >
-              {cover(hero) && (
-                <Image
-                  src={cover(hero)!}
-                  alt={hero.title}
-                  width={1400}
-                  height={900}
-                  priority
-                  className="absolute inset-0 h-full w-full object-cover opacity-60"
-                />
-              )}
+    <main className="min-h-screen bg-slate-50">
+      {/* Breaking News Banner */}
+      <BreakingNewsBanner breakingNews={breakingNews} />
 
-              <div className="relative z-10 p-10 space-y-4">
-                <span className="inline-block rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase">
-                  Top Story
-                </span>
-
-                <h1 className="text-4xl lg:text-5xl font-extrabold leading-tight">
-                  {hero.title}
-                </h1>
-
-                {hero.excerpt && (
-                  <p className="max-w-2xl text-lg text-white/85">
-                    {hero.excerpt}
-                  </p>
-                )}
-              </div>
-            </Link>
-          </motion.div>
-
-          {/* Top Stories Rail */}
-          <motion.aside
-            variants={stagger}
-            className="lg:col-span-4 space-y-4"
-          >
-            <motion.h2 variants={fadeUp} className="text-lg font-bold">
-              Top Stories
-            </motion.h2>
-
-            <div className="divide-y rounded-2xl border bg-white">
-              {secondary.map((a) => (
-                <motion.div key={a.id} variants={fadeUp}>
-                  <Link
-                    href={articleUrl(a)}
-                    className="block p-4 hover:bg-slate-50 transition"
-                  >
-                    <p className="font-semibold leading-snug hover:text-indigo-600">
-                      {a.title}
-                    </p>
-                    <p className="mt-1 text-xs text-slate-500">
-                      {a.category?.name}
-                      {a.publishedAt && ` • ${formatDate(a.publishedAt)}`}
-                    </p>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </motion.aside>
-        </motion.section>
+      {/* Hero Section */}
+      {featuredArticles.length > 0 && (
+        <HeroSection featuredArticles={featuredArticles} />
       )}
 
-      {/* ================= EDITORS PICKS ================= */}
-      <motion.section
-        variants={stagger}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true }}
-        className="grid gap-10 lg:grid-cols-12"
-      >
-        <div className="lg:col-span-8 space-y-8">
-          <motion.h2 variants={fadeUp} className="text-2xl font-bold">
-            Editors’ Picks
-          </motion.h2>
-
-          <div className="grid gap-8 sm:grid-cols-2">
-            {editorsPicks.map((a) => (
-              <motion.div
-                key={a.id}
-                variants={fadeUp}
-                whileHover={{
-                  y: -4,
-                  transition: { duration: 0.25, ease: "easeOut" },
-                }}
+      {/* Main Content Grid */}
+      <div className="mx-auto max-w-7xl px-6 py-12">
+        <div className="grid gap-8 lg:grid-cols-12">
+          {/* Main Content */}
+          <div className="lg:col-span-8 space-y-12">
+            {/* Editor's Picks Section */}
+            {editorPicksTransformed.length > 0 && (
+              <motion.section
+                variants={stagger}
+                initial="hidden"
+                animate="show"
+                className="space-y-8"
               >
-                <Link
-                  href={articleUrl(a)}
-                  className="block overflow-hidden rounded-2xl border bg-white hover:shadow-lg transition"
-                >
-                  {cover(a) && (
-                    <Image
-                      src={cover(a)!}
-                      alt={a.title}
-                      width={800}
-                      height={500}
-                      className="h-48 w-full object-cover"
-                    />
-                  )}
+                <motion.div variants={fadeUp}>
+                  <h2 className="text-3xl font-bold text-slate-900">Editor's Picks</h2>
+                  <p className="mt-2 text-lg text-slate-600">
+                    Carefully curated stories from our editorial team
+                  </p>
+                </motion.div>
 
-                  <div className="p-5 space-y-2">
-                    <span className="text-xs uppercase text-slate-500">
-                      {a.category?.name}
-                    </span>
+                <div className="grid gap-8 md:grid-cols-2">
+                  {editorPicksTransformed.slice(0, 4).map((article, index) => (
+                    <motion.div key={article.id} variants={fadeUp}>
+                      <ArticleCardLarge
+                        article={article}
+                        layout="vertical"
+                        className="h-full"
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.section>
+            )}
 
-                    <h3 className="font-semibold leading-snug hover:text-indigo-600">
-                      {a.title}
-                    </h3>
-
-                    {a.excerpt && (
-                      <p className="text-sm text-slate-600 line-clamp-3">
-                        {a.excerpt}
-                      </p>
-                    )}
-                  </div>
-                </Link>
+            {/* Latest News Section */}
+            <motion.section
+              variants={stagger}
+              initial="hidden"
+              animate="show"
+              className="space-y-8"
+            >
+              <motion.div variants={fadeUp}>
+                <h2 className="text-3xl font-bold text-slate-900">Latest News</h2>
+                <p className="mt-2 text-lg text-slate-600">
+                  Stay up to date with the most recent developments
+                </p>
               </motion.div>
-            ))}
+
+              <div className="space-y-6">
+                {topStories.slice(5, 10).map((article, index) => {
+                  const transformed = transformedArticles([article])[0];
+                  return (
+                    <motion.div key={article.id} variants={fadeUp}>
+                      <ArticleCardLarge
+                        article={transformed}
+                        layout="horizontal"
+                        className="w-full"
+                      />
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </motion.section>
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-4">
+            <div className="sticky top-8">
+              <Sidebar
+                trendingArticles={trendingTransformed}
+                showNewsletter={true}
+              />
+            </div>
           </div>
         </div>
-
-        {/* Trending */}
-        <motion.aside
-          variants={fadeUp}
-          className="lg:col-span-4 space-y-6"
-        >
-          <h3 className="text-lg font-bold">Trending</h3>
-
-          <ol className="rounded-2xl border bg-white p-5 space-y-5">
-            {trending.map((a, i) => (
-              <li key={a.id} className="flex gap-4">
-                <span className="text-3xl font-extrabold text-slate-200">
-                  {i + 1}
-                </span>
-                <Link href={articleUrl(a)}>
-                  <p className="font-medium hover:text-indigo-600">
-                    {a.title}
-                  </p>
-                </Link>
-              </li>
-            ))}
-          </ol>
-        </motion.aside>
-      </motion.section>
+      </div>
     </main>
   );
 }
