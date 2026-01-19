@@ -91,6 +91,7 @@ export const Q_ARTICLE_BY_ID = /* GraphQL */ `
       excerpt
       topic
       status
+      isBreakingNews
       authorName
       publishedAt
       createdAt
@@ -113,6 +114,7 @@ export const Q_ARTICLE_BY_SLUG = /* GraphQL */ `
       excerpt
       topic
       status
+      isBreakingNews
       authorName
       publishedAt
       createdAt
@@ -139,6 +141,7 @@ export const M_UPSERT_ARTICLE = /* GraphQL */ `
       excerpt
       topic
       status
+      isBreakingNews
       publishedAt
       category {
         id
@@ -206,6 +209,7 @@ export const Q_BREAKING_NEWS = /* GraphQL */ `
       slug
       excerpt
       topic
+      isBreakingNews
       contentJson
       category { name slug }
     }
