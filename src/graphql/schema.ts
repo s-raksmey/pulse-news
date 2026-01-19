@@ -285,10 +285,19 @@ export const schema = createSchema({
       },
 
       articleBySlug: async (_: unknown, { slug }: { slug: string }) =>
-        db.article.findFirst({ where: { slug } }),
+        db.article.findFirst({ 
+          where: { 
+            slug,
+            status: "PUBLISHED" // Only show published articles
+          },
+          include: { category: true }
+        }),
 
       articleById: async (_: unknown, { id }: { id: string }) =>
-        db.article.findUnique({ where: { id } }),
+        db.article.findUnique({ 
+          where: { id },
+          include: { category: true }
+        }),
 
       topStories: async (_: unknown, { limit }: { limit?: number }) =>
         db.article.findMany({
