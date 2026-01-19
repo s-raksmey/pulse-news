@@ -3,6 +3,7 @@ import { getGqlClient } from "@/services/graphql-client";
 import {
   Q_TOP_STORIES,
   Q_EDITORS_PICKS,
+  Q_BREAKING_NEWS,
   Q_TRENDING,
 } from "@/services/article.gql";
 import HomePageClient from "@/components/home/home";
@@ -13,9 +14,10 @@ export default async function HomePage() {
   const client = getGqlClient();
 
   try {
-    const [top, picks, trending] = await Promise.all([
+    const [top, picks, breaking, trending] = await Promise.all([
       client.request(Q_TOP_STORIES).catch(() => ({ topStories: [] })),
       client.request(Q_EDITORS_PICKS).catch(() => ({ editorsPicks: [] })),
+      client.request(Q_BREAKING_NEWS).catch(() => ({ breakingNews: [] })),
       client.request(Q_TRENDING).catch(() => ({ trending: [] })),
     ]);
 
@@ -23,6 +25,7 @@ export default async function HomePage() {
       <HomePageClient
         topStories={top?.topStories ?? []}
         editorsPicks={picks?.editorsPicks ?? []}
+        breakingNews={breaking?.breakingNews ?? []}
         trending={trending?.trending ?? []}
       />
     );
@@ -32,6 +35,7 @@ export default async function HomePage() {
       <HomePageClient
         topStories={[]}
         editorsPicks={[]}
+        breakingNews={[]}
         trending={[]}
       />
     );

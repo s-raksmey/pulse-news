@@ -78,6 +78,7 @@ model Article {
 
   isFeatured      Boolean   @default(false)
   isEditorsPick   Boolean   @default(false)
+  isBreakingNews  Boolean   @default(false)
   pinnedAt        DateTime?
   viewCount       Int       @default(0)
 

@@ -198,6 +198,20 @@ export const Q_EDITORS_PICKS = /* GraphQL */ `
   }
 `;
 
+export const Q_BREAKING_NEWS = /* GraphQL */ `
+  query {
+    breakingNews {
+      id
+      title
+      slug
+      excerpt
+      topic
+      contentJson
+      category { name slug }
+    }
+  }
+`;
+
 export const Q_TRENDING = /* GraphQL */ `
   query {
     trending {

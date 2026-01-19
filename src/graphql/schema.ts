@@ -30,6 +30,7 @@ const ArticleInput = z.object({
 
   isFeatured: z.boolean().optional(),
   isEditorsPick: z.boolean().optional(),
+  isBreakingNews: z.boolean().optional(),
   authorName: z.string().optional().nullable(),
   coverImageUrl: z.string().optional().nullable(),
 
@@ -108,6 +109,7 @@ export const schema = createSchema({
 
       isFeatured: Boolean
       isEditorsPick: Boolean
+      isBreakingNews: Boolean
       pinnedAt: String
       viewCount: Int
 
@@ -130,6 +132,7 @@ export const schema = createSchema({
 
       isFeatured: Boolean
       isEditorsPick: Boolean
+      isBreakingNews: Boolean
       pinnedAt: String
 
       authorName: String
@@ -157,6 +160,7 @@ export const schema = createSchema({
 
       topStories(limit: Int = 6): [Article!]!
       editorsPicks(limit: Int = 6): [Article!]!
+      breakingNews(limit: Int = 6): [Article!]!
       latestByCategory(categorySlug: String!, limit: Int = 6): [Article!]!
       trending(limit: Int = 10): [Article!]!
       relatedArticles(slug: String!, limit: Int = 6): [Article!]!
@@ -313,6 +317,16 @@ export const schema = createSchema({
       editorsPicks: async (_: unknown, { limit }: { limit?: number }) =>
         db.article.findMany({
           where: { isEditorsPick: true, status: "PUBLISHED" },
+          orderBy: [
+            { pinnedAt: { sort: "desc", nulls: "last" } },
+            { publishedAt: "desc" },
+          ],
+          take: limit ?? 6,
+        }),
+
+      breakingNews: async (_: unknown, { limit }: { limit?: number }) =>
+        db.article.findMany({
+          where: { isBreakingNews: true, status: "PUBLISHED" },
           orderBy: [
             { pinnedAt: { sort: "desc", nulls: "last" } },
             { publishedAt: "desc" },
