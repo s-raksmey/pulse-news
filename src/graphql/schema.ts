@@ -278,6 +278,7 @@ export const schema = createSchema({
             ogImageUrl: true,
             isFeatured: true,
             isEditorsPick: true,
+            isBreakingNews: true,
             pinnedAt: true,
             viewCount: true,
             publishedAt: true,
@@ -445,6 +446,7 @@ export const schema = createSchema({
 
           isFeatured: data.isFeatured ?? false,
           isEditorsPick: data.isEditorsPick ?? false,
+          isBreakingNews: data.isBreakingNews ?? false,
           pinnedAt: data.pinnedAt ? new Date(data.pinnedAt) : null,
 
           authorName: data.authorName ?? null,

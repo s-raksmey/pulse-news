@@ -65,6 +65,7 @@ export default function EditorRenderer({
   return (
     <article className="mx-auto max-w-3xl space-y-6">
       {data.blocks.map((b: EditorBlock, i: number) => {
+        try {
         const highlight = b.tunes?.highlight?.highlighted
           ? "editor-highlight bg-yellow-50 border-l-4 border-yellow-400 pl-4 py-2 rounded-r"
           : "";
@@ -152,17 +153,17 @@ export default function EditorRenderer({
           
           return b.data.style === "ordered" ? (
             <ol key={b.id || i} className={`list-decimal pl-6 space-y-2 ${highlight}`}>
-              {items.map((item: string, idx: number) => (
+              {items.map((item: any, idx: number) => (
                 <li key={idx} className="text-slate-700">
-                  {item}
+                  {typeof item === 'string' ? item : (item?.content || item?.text || JSON.stringify(item))}
                 </li>
               ))}
             </ol>
           ) : (
             <ul key={b.id || i} className={`list-disc pl-6 space-y-2 ${highlight}`}>
-              {items.map((item: string, idx: number) => (
+              {items.map((item: any, idx: number) => (
                 <li key={idx} className="text-slate-700">
-                  {item}
+                  {typeof item === 'string' ? item : (item?.content || item?.text || JSON.stringify(item))}
                 </li>
               ))}
             </ul>
@@ -297,6 +298,25 @@ export default function EditorRenderer({
             )}
           </div>
         );
+        } catch (error) {
+          console.error('Error rendering block:', error, b);
+          return (
+            <div 
+              key={b.id || i} 
+              className="my-4 p-4 bg-red-100 rounded border border-red-300 text-sm text-red-600"
+            >
+              <div className="font-medium mb-1">Error rendering block: <code>{b.type}</code></div>
+              <div className="text-xs opacity-75">
+                Block ID: {b.id || 'N/A'}
+              </div>
+              {process.env.NODE_ENV === 'development' && (
+                <pre className="mt-2 text-xs overflow-auto max-h-40">
+                  {JSON.stringify(b, null, 2)}
+                </pre>
+              )}
+            </div>
+          );
+        }
       })}
     </article>
   );
