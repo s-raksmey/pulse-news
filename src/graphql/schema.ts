@@ -278,7 +278,7 @@ export const schema = createSchema({
             ogImageUrl: true,
             isFeatured: true,
             isEditorsPick: true,
-            isBreakingNews: true,
+            // isBreakingNews: true, // TODO: Add back when database migration is applied
             pinnedAt: true,
             viewCount: true,
             publishedAt: true,
@@ -326,14 +326,16 @@ export const schema = createSchema({
         }),
 
       breakingNews: async (_: unknown, { limit }: { limit?: number }) =>
-        db.article.findMany({
-          where: { isBreakingNews: true, status: "PUBLISHED" },
-          orderBy: [
-            { pinnedAt: { sort: "desc", nulls: "last" } },
-            { publishedAt: "desc" },
-          ],
-          take: limit ?? 6,
-        }),
+        // TODO: Re-enable when isBreakingNews field is added to database
+        // db.article.findMany({
+        //   where: { isBreakingNews: true, status: "PUBLISHED" },
+        //   orderBy: [
+        //     { pinnedAt: { sort: "desc", nulls: "last" } },
+        //     { publishedAt: "desc" },
+        //   ],
+        //   take: limit ?? 6,
+        // }),
+        [],
 
       latestByCategory: async (
         _: unknown,
@@ -446,7 +448,7 @@ export const schema = createSchema({
 
           isFeatured: data.isFeatured ?? false,
           isEditorsPick: data.isEditorsPick ?? false,
-          isBreakingNews: data.isBreakingNews ?? false,
+          // isBreakingNews: data.isBreakingNews ?? false, // TODO: Add back when database migration is applied
           pinnedAt: data.pinnedAt ? new Date(data.pinnedAt) : null,
 
           authorName: data.authorName ?? null,
