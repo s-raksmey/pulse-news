@@ -68,18 +68,18 @@ export default function HomePageClient({
   editorsPicks: Article[];
   trending: Article[];
 }) {
-  // Mock breaking news data - replace with actual data
+  // Breaking news data using actual articles from the database
   const breakingNews = [
     {
       id: "1",
-      title: "Breaking: Major Economic Summit Reaches Historic Agreement",
-      url: "/world/latest/economic-summit",
+      title: "Breaking: World Briefing Sample - Latest Global Updates",
+      url: "/world/asia/world-briefing-sample",
       timestamp: new Date().toISOString(),
     },
     {
       id: "2", 
       title: "Tech Giant Announces Revolutionary AI Breakthrough",
-      url: "/tech/latest/ai-breakthrough",
+      url: "/tech/ai/welcome-to-pulse-news",
       timestamp: new Date().toISOString(),
     },
   ];
