@@ -62,27 +62,21 @@ const stagger: Variants = {
 export default function HomePageClient({
   topStories,
   editorsPicks,
+  breakingNews,
   trending,
 }: {
   topStories: Article[];
   editorsPicks: Article[];
+  breakingNews: Article[];
   trending: Article[];
 }) {
-  // Breaking news data using actual articles from the database
-  const breakingNews = [
-    {
-      id: "1",
-      title: "Breaking: World Briefing Sample - Latest Global Updates",
-      url: "/world/asia/world-briefing-sample",
-      timestamp: new Date().toISOString(),
-    },
-    {
-      id: "2", 
-      title: "Tech Giant Announces Revolutionary AI Breakthrough",
-      url: "/tech/ai/welcome-to-pulse-news",
-      timestamp: new Date().toISOString(),
-    },
-  ];
+  // Transform breaking news data for the banner component
+  const breakingNewsForBanner = breakingNews.map(article => ({
+    id: article.id,
+    title: `Breaking: ${article.title}`,
+    url: articleUrl(article),
+    timestamp: article.publishedAt || new Date().toISOString(),
+  }));
 
   // Helper function to generate deterministic values based on article ID
   const generateDeterministicValue = (id: string, seed: number, min: number, max: number) => {
@@ -130,7 +124,7 @@ export default function HomePageClient({
   return (
     <main className="min-h-screen bg-slate-50">
       {/* Breaking News Banner */}
-      <BreakingNewsBanner breakingNews={breakingNews} />
+      <BreakingNewsBanner breakingNews={breakingNewsForBanner} />
 
       {/* Hero Section */}
       {featuredArticles.length > 0 && (
