@@ -57,7 +57,6 @@ export default function NewArticlePage() {
   const [topic, setTopic] = useState<string>("");
 
   const [status, setStatus] = useState<"DRAFT" | "PUBLISHED">("DRAFT");
-  const [isBreakingNews, setIsBreakingNews] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const categoryOptions = Object.keys(MEGA_NAV);
@@ -87,7 +86,6 @@ export default function NewArticlePage() {
           categorySlug,
           topic: topic || null,
           status,
-          isBreakingNews,
           contentJson,
         },
       });
@@ -119,7 +117,6 @@ export default function NewArticlePage() {
         authorName, // ✅ ADDED
         categorySlug,
         topic,
-        isBreakingNews,
         content: contentJson,
       })
     );
@@ -242,23 +239,6 @@ export default function NewArticlePage() {
             <option value="DRAFT">DRAFT</option>
             <option value="PUBLISHED">PUBLISHED</option>
           </select>
-        </div>
-      </div>
-
-      {/* ---------- Special Features ---------- */}
-      <div className="space-y-4">
-        <h3 className="text-sm font-semibold text-slate-700">Special Features</h3>
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="isBreakingNews"
-            checked={isBreakingNews}
-            onChange={(e) => setIsBreakingNews(e.target.checked)}
-            className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-          />
-          <label htmlFor="isBreakingNews" className="text-sm text-slate-700">
-            Mark as Breaking News
-          </label>
         </div>
       </div>
 

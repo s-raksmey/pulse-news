@@ -30,7 +30,6 @@ const ArticleInput = z.object({
 
   isFeatured: z.boolean().optional(),
   isEditorsPick: z.boolean().optional(),
-  isBreakingNews: z.boolean().optional(),
   authorName: z.string().optional().nullable(),
   coverImageUrl: z.string().optional().nullable(),
 
@@ -109,7 +108,6 @@ export const schema = createSchema({
 
       isFeatured: Boolean
       isEditorsPick: Boolean
-      isBreakingNews: Boolean
       pinnedAt: String
       viewCount: Int
 
@@ -132,7 +130,6 @@ export const schema = createSchema({
 
       isFeatured: Boolean
       isEditorsPick: Boolean
-      isBreakingNews: Boolean
       pinnedAt: String
 
       authorName: String
@@ -278,7 +275,6 @@ export const schema = createSchema({
             ogImageUrl: true,
             isFeatured: true,
             isEditorsPick: true,
-            // isBreakingNews: true, // TODO: Add back when database migration is applied
             pinnedAt: true,
             viewCount: true,
             publishedAt: true,
@@ -326,15 +322,6 @@ export const schema = createSchema({
         }),
 
       breakingNews: async (_: unknown, { limit }: { limit?: number }) =>
-        // TODO: Re-enable when isBreakingNews field is added to database
-        // db.article.findMany({
-        //   where: { isBreakingNews: true, status: "PUBLISHED" },
-        //   orderBy: [
-        //     { pinnedAt: { sort: "desc", nulls: "last" } },
-        //     { publishedAt: "desc" },
-        //   ],
-        //   take: limit ?? 6,
-        // }),
         [],
 
       latestByCategory: async (
@@ -448,7 +435,6 @@ export const schema = createSchema({
 
           isFeatured: data.isFeatured ?? false,
           isEditorsPick: data.isEditorsPick ?? false,
-          // isBreakingNews: data.isBreakingNews ?? false, // TODO: Add back when database migration is applied
           pinnedAt: data.pinnedAt ? new Date(data.pinnedAt) : null,
 
           authorName: data.authorName ?? null,
