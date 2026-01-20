@@ -10,8 +10,12 @@ export const metadata: Metadata = {
   description: "News website with CMS dashboard and Editor.js",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const cookieStore = cookies();
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const cookieStore = await cookies();
   const requestedLocale = cookieStore.get("locale")?.value;
   const locale = requestedLocale === "km" ? "km" : "en";
 
