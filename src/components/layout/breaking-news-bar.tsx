@@ -61,7 +61,7 @@ export default function BreakingNewsBar({ locale }: { locale: Locale }) {
 
         const mapped = data.data.map((article) => ({
           id: article.id,
-          title: `${t.breaking.prefix} ${article.title}`,
+          title: `${article.title}`,
           url: articleUrl(article),
           timestamp: article.publishedAt ?? new Date().toISOString(),
         }));
