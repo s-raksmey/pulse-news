@@ -30,6 +30,7 @@ const ArticleInput = z.object({
 
   isFeatured: z.boolean().optional(),
   isEditorsPick: z.boolean().optional(),
+  isBreaking: z.boolean().optional(),
   authorName: z.string().optional().nullable(),
   coverImageUrl: z.string().optional().nullable(),
 
@@ -108,6 +109,7 @@ export const schema = createSchema({
 
       isFeatured: Boolean
       isEditorsPick: Boolean
+      isBreaking: Boolean
       pinnedAt: String
       viewCount: Int
 
@@ -130,6 +132,7 @@ export const schema = createSchema({
 
       isFeatured: Boolean
       isEditorsPick: Boolean
+      isBreaking: Boolean
       pinnedAt: String
 
       authorName: String
@@ -275,6 +278,7 @@ export const schema = createSchema({
             ogImageUrl: true,
             isFeatured: true,
             isEditorsPick: true,
+            isBreaking: true,
             pinnedAt: true,
             viewCount: true,
             publishedAt: true,
@@ -322,7 +326,14 @@ export const schema = createSchema({
         }),
 
       breakingNews: async (_: unknown, { limit }: { limit?: number }) =>
-        [],
+        db.article.findMany({
+          where: { isBreaking: true, status: "PUBLISHED" },
+          orderBy: [
+            { pinnedAt: { sort: "desc", nulls: "last" } },
+            { publishedAt: "desc" },
+          ],
+          take: limit ?? 6,
+        }),
 
       latestByCategory: async (
         _: unknown,
@@ -435,6 +446,7 @@ export const schema = createSchema({
 
           isFeatured: data.isFeatured ?? false,
           isEditorsPick: data.isEditorsPick ?? false,
+          isBreaking: data.isBreaking ?? false,
           pinnedAt: data.pinnedAt ? new Date(data.pinnedAt) : null,
 
           authorName: data.authorName ?? null,

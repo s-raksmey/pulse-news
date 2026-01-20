@@ -3,7 +3,7 @@ import { GraphQLClient } from "graphql-request";
 function getBaseUrl() {
   // ✅ Server-side
   if (typeof window === "undefined") {
-    return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:4000";
   }
 
   // ✅ Client-side (browser)
