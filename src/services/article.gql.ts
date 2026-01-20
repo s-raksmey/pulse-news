@@ -226,6 +226,7 @@ export const Q_TRENDING = /* GraphQL */ `
       slug
       topic
       contentJson
+      publishedAt
       category { name slug }
     }
   }
