@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import FeaturedArticleCard from "./featured-article-card";
+import { getTranslations, type Locale } from "@/lib/i18n";
 
 interface Article {
   id: string;
@@ -27,6 +28,7 @@ interface Article {
 }
 
 interface HeroSectionProps {
+  locale: Locale;
   featuredArticles: Article[];
   className?: string;
 }
@@ -54,7 +56,9 @@ const itemVariants = {
   },
 };
 
-export default function HeroSection({ featuredArticles, className = "" }: HeroSectionProps) {
+export default function HeroSection({ locale, featuredArticles, className = "" }: HeroSectionProps) {
+  const t = getTranslations(locale);
+
   if (!featuredArticles || featuredArticles.length === 0) {
     return null;
   }
@@ -74,10 +78,10 @@ export default function HeroSection({ featuredArticles, className = "" }: HeroSe
           className="mb-8"
         >
           <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl">
-            Featured Stories
+            {t.home.featuredTitle}
           </h2>
           <p className="mt-2 text-lg text-slate-600">
-            The most important news and stories of the day
+            {t.home.featuredSubtitle}
           </p>
         </motion.div>
 
@@ -91,6 +95,7 @@ export default function HeroSection({ featuredArticles, className = "" }: HeroSe
           {/* Main Featured Article - Takes up 2x2 space on large screens */}
           <motion.div variants={itemVariants} className="lg:col-span-2 lg:row-span-2">
             <FeaturedArticleCard
+              locale={locale}
               article={mainArticle}
               size="large"
               showExcerpt={true}
@@ -106,6 +111,7 @@ export default function HeroSection({ featuredArticles, className = "" }: HeroSe
               className="lg:col-span-1 lg:row-span-1"
             >
               <FeaturedArticleCard
+                locale={locale}
                 article={article}
                 size="medium"
                 showExcerpt={false}
@@ -122,7 +128,7 @@ export default function HeroSection({ featuredArticles, className = "" }: HeroSe
               className="hidden lg:block lg:col-span-1 lg:row-span-1"
             >
               <div className="flex h-full items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50">
-                <p className="text-slate-400">More stories coming soon</p>
+                <p className="text-slate-400">{t.home.moreStories}</p>
               </div>
             </motion.div>
           ))}
@@ -137,16 +143,16 @@ export default function HeroSection({ featuredArticles, className = "" }: HeroSe
         >
           <div className="flex flex-wrap items-center gap-4">
             <span className="text-sm font-semibold text-slate-700 uppercase tracking-wide">
-              Trending Topics:
+              {t.home.trendingTopicsLabel}
             </span>
             <div className="flex flex-wrap gap-2">
               {[
-                "Breaking News",
-                "Technology",
-                "Politics",
-                "Climate Change",
-                "Economy",
-                "Sports",
+                t.topics.breakingNews,
+                t.topics.technology,
+                t.topics.politics,
+                t.topics.climateChange,
+                t.topics.economy,
+                t.topics.sports,
               ].map((topic) => (
                 <button
                   key={topic}

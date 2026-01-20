@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Clock, TrendingUp } from "lucide-react";
+import { getTranslations, type Locale } from "@/lib/i18n";
 
 interface Article {
   id: string;
@@ -31,10 +32,12 @@ interface ArticleCardCompactProps {
   showCategory?: boolean;
   showViews?: boolean;
   className?: string;
+  locale: Locale;
 }
 
 export default function ArticleCardCompact({
   article,
+  locale,
   index,
   showImage = true,
   showCategory = false,
@@ -42,18 +45,20 @@ export default function ArticleCardCompact({
   className = "",
 }: ArticleCardCompactProps) {
   const articleUrl = `/${article.category?.slug || "news"}/${article.topic || "latest"}/${article.slug}`;
+  const t = getTranslations(locale);
+  const dateLocale = locale === "km" ? "km-KH" : "en-US";
   
   const formatDate = (dateString: string) => {
     if (!dateString) {
-      return "Unknown date";
+      return t.article.unknownDate;
     }
 
     const date = new Date(dateString);
     if (Number.isNaN(date.getTime())) {
-      return "Unknown date";
+      return t.article.unknownDate;
     }
 
-    return date.toLocaleDateString("en-US", {
+    return date.toLocaleDateString(dateLocale, {
       month: "short",
       day: "numeric",
     });
@@ -125,7 +130,7 @@ export default function ArticleCardCompact({
               {article.readTime && (
                 <div className="flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  <span>{article.readTime}m</span>
+                  <span>{article.readTime} {t.article.minLabel}</span>
                 </div>
               )}
 

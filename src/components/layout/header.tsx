@@ -7,15 +7,16 @@ import MegaMenu from "@/components/layout/mega-menu";
 import LanguageToggle from "@/components/layout/language-toggle";
 import MobileMenu from "@/components/layout/mobile-menu";
 import SearchBar from "@/components/layout/search-bar";
+import { getTranslations } from "@/lib/i18n";
 
 const NAV_ITEMS = [
-  { key: "home", label: "Home", href: "/" },
-  { key: "world", label: "World", href: "/world" },
-  { key: "tech", label: "Tech", href: "/tech" },
-  { key: "business", label: "Business", href: "/business" },
-  { key: "politics", label: "Politics", href: "/politics" },
-  { key: "sports", label: "Sports", href: "/sports" },
-  { key: "culture", label: "Culture", href: "/culture" },
+  { key: "home", href: "/" },
+  { key: "world", href: "/world" },
+  { key: "tech", href: "/tech" },
+  { key: "business", href: "/business" },
+  { key: "politics", href: "/politics" },
+  { key: "sports", href: "/sports" },
+  { key: "culture", href: "/culture" },
 ];
 
 type HeaderProps = {
@@ -26,6 +27,7 @@ export default function Header({ locale }: HeaderProps) {
   const [active, setActive] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const t = getTranslations(locale);
 
   return (
     <>
@@ -47,7 +49,7 @@ export default function Header({ locale }: HeaderProps) {
                   onMouseEnter={() => setActive(hasDropdown ? item.key : null)}
                   className="flex items-center gap-1 text-sm font-medium text-slate-800 hover:text-slate-900"
                 >
-                  {item.label}
+                  {t.nav[item.key as keyof typeof t.nav]}
                   {hasDropdown && (
                     <ChevronDown
                       className={`h-3.5 w-3.5 transition-transform ${
@@ -65,7 +67,7 @@ export default function Header({ locale }: HeaderProps) {
             <button
               onClick={() => setIsSearchOpen(true)}
               className="rounded-md p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-              aria-label="Search"
+              aria-label={t.header.searchLabel}
             >
               <Search className="h-4 w-4" />
             </button>
@@ -74,7 +76,7 @@ export default function Header({ locale }: HeaderProps) {
             <div className="hidden items-center gap-3 md:flex">
               <LanguageToggle initialLocale={locale} />
               <Link href="/admin" className="rounded-md border px-3 py-1.5 text-sm hover:bg-slate-100">
-                CMS
+                {t.header.cmsLabel}
               </Link>
             </div>
 
@@ -94,10 +96,10 @@ export default function Header({ locale }: HeaderProps) {
       </header>
 
       {/* Mobile Menu */}
-      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
+      <MobileMenu locale={locale} isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
 
       {/* Search Bar */}
-      <SearchBar isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      <SearchBar locale={locale} isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   );
 }

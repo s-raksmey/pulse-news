@@ -4,20 +4,22 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronRight, Home, Globe, Laptop, Briefcase, Vote, Trophy, Palette } from "lucide-react";
+import { getTranslations, type Locale } from "@/lib/i18n";
 
 interface MobileMenuProps {
+  locale: Locale;
   isOpen: boolean;
   onClose: () => void;
 }
 
 const NAV_ITEMS = [
-  { key: "home", label: "Home", href: "/", icon: Home },
-  { key: "world", label: "World", href: "/world", icon: Globe },
-  { key: "tech", label: "Tech", href: "/tech", icon: Laptop },
-  { key: "business", label: "Business", href: "/business", icon: Briefcase },
-  { key: "politics", label: "Politics", href: "/politics", icon: Vote },
-  { key: "sports", label: "Sports", href: "/sports", icon: Trophy },
-  { key: "culture", label: "Culture", href: "/culture", icon: Palette },
+  { key: "home", href: "/", icon: Home },
+  { key: "world", href: "/world", icon: Globe },
+  { key: "tech", href: "/tech", icon: Laptop },
+  { key: "business", href: "/business", icon: Briefcase },
+  { key: "politics", href: "/politics", icon: Vote },
+  { key: "sports", href: "/sports", icon: Trophy },
+  { key: "culture", href: "/culture", icon: Palette },
 ];
 
 const menuVariants = {
@@ -51,7 +53,8 @@ const itemVariants = {
   }),
 };
 
-export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
+export default function MobileMenu({ locale, isOpen, onClose }: MobileMenuProps) {
+  const t = getTranslations(locale);
   // Prevent body scroll when menu is open
   useEffect(() => {
     if (isOpen) {
@@ -119,7 +122,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                         className="flex items-center gap-4 rounded-lg p-3 text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
                       >
                         <Icon className="h-5 w-5" />
-                        <span className="font-medium">{item.label}</span>
+                        <span className="font-medium">{t.nav[item.key as keyof typeof t.nav]}</span>
                         <ChevronRight className="ml-auto h-4 w-4 text-slate-400" />
                       </Link>
                     </motion.div>
@@ -143,7 +146,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     onClick={onClose}
                     className="flex items-center gap-4 rounded-lg p-3 text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
                   >
-                    <span className="font-medium">CMS Dashboard</span>
+                    <span className="font-medium">{t.mobile.cmsDashboard}</span>
                     <ChevronRight className="ml-auto h-4 w-4 text-slate-400" />
                   </Link>
                 </motion.div>
@@ -160,7 +163,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 className="text-center"
               >
                 <p className="text-sm text-slate-500">
-                  Stay informed with the latest news
+                  {t.mobile.stayInformed}
                 </p>
                 <div className="mt-4 flex justify-center gap-4">
                   {[

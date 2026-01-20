@@ -23,9 +23,9 @@ export default async function RootLayout({
     <html lang={locale} data-locale={locale} className="bg-white">
       <body className="min-h-screen bg-white text-slate-900">
         <Header locale={locale} />
-        <BreakingNewsBar />
+        <BreakingNewsBar locale={locale} />
         <div className="min-h-[calc(100vh-140px)]">{children}</div>
-        <Footer />
+        <Footer locale={locale} />
       </body>
     </html>
   );

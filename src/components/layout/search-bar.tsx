@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, Clock, TrendingUp } from "lucide-react";
+import { getTranslations, type Locale } from "@/lib/i18n";
 
 interface SearchResult {
   id: string;
@@ -13,6 +14,7 @@ interface SearchResult {
 }
 
 interface SearchBarProps {
+  locale: Locale;
   isOpen: boolean;
   onClose: () => void;
   className?: string;
@@ -57,11 +59,12 @@ const trendingSearches = [
   "Sports updates",
 ];
 
-export default function SearchBar({ isOpen, onClose, className = "" }: SearchBarProps) {
+export default function SearchBar({ locale, isOpen, onClose, className = "" }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const t = getTranslations(locale);
 
   // Focus input when search opens
   useEffect(() => {
@@ -138,7 +141,7 @@ export default function SearchBar({ isOpen, onClose, className = "" }: SearchBar
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search articles, categories, authors..."
+                  placeholder={t.search.placeholder}
                   className="w-full rounded-lg border border-slate-200 py-4 pl-12 pr-12 text-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
                 <button
@@ -162,7 +165,7 @@ export default function SearchBar({ isOpen, onClose, className = "" }: SearchBar
                   ) : results.length > 0 ? (
                     <div className="space-y-2">
                       <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">
-                        Search Results
+                        {t.search.resultsTitle}
                       </h3>
                       {results.map((result) => (
                         <button
@@ -182,7 +185,9 @@ export default function SearchBar({ isOpen, onClose, className = "" }: SearchBar
                     </div>
                   ) : (
                     <div className="py-8 text-center">
-                      <p className="text-slate-500">No results found for "{query}"</p>
+                      <p className="text-slate-500">
+                        {t.search.noResults.replace("{query}", query)}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -193,7 +198,7 @@ export default function SearchBar({ isOpen, onClose, className = "" }: SearchBar
                     <div className="mb-3 flex items-center gap-2">
                       <Clock className="h-4 w-4 text-slate-400" />
                       <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">
-                        Recent Searches
+                        {t.search.recentTitle}
                       </h3>
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -214,7 +219,7 @@ export default function SearchBar({ isOpen, onClose, className = "" }: SearchBar
                     <div className="mb-3 flex items-center gap-2">
                       <TrendingUp className="h-4 w-4 text-slate-400" />
                       <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">
-                        Trending Searches
+                        {t.search.trendingTitle}
                       </h3>
                     </div>
                     <div className="flex flex-wrap gap-2">

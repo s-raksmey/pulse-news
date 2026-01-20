@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Clock, User, ArrowRight } from "lucide-react";
+import { getTranslations, type Locale } from "@/lib/i18n";
 
 interface Article {
   id: string;
@@ -34,19 +35,23 @@ interface FeaturedArticleCardProps {
   layout?: "vertical" | "horizontal";
   showExcerpt?: boolean;
   className?: string;
+  locale: Locale;
 }
 
 export default function FeaturedArticleCard({
   article,
+  locale,
   size = "large",
   layout = "vertical",
   showExcerpt = true,
   className = "",
 }: FeaturedArticleCardProps) {
   const articleUrl = `/${article.category?.slug || "news"}/${article.topic || "latest"}/${article.slug}`;
-  
+  const t = getTranslations(locale);
+  const dateLocale = locale === "km" ? "km-KH" : "en-US";
+
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString(dateLocale, {
       month: "short",
       day: "numeric",
       year: "numeric",
@@ -86,7 +91,7 @@ export default function FeaturedArticleCard({
             />
           ) : (
             <div className="flex h-full items-center justify-center bg-slate-200">
-              <span className="text-slate-400">No image</span>
+              <span className="text-slate-400">{t.article.noImage}</span>
             </div>
           )}
           
@@ -110,7 +115,7 @@ export default function FeaturedArticleCard({
             <div className="absolute right-4 top-4">
               <span className="flex items-center gap-1 rounded-full bg-black/50 px-2 py-1 text-xs text-white backdrop-blur-sm">
                 <Clock className="h-3 w-3" />
-                {article.readTime} min
+                {article.readTime} {t.article.minLabel}
               </span>
             </div>
           )}
@@ -156,7 +161,7 @@ export default function FeaturedArticleCard({
 
             {/* Read more indicator */}
             <div className="flex items-center gap-2 text-sm font-medium text-blue-200 opacity-0 transition-opacity group-hover:opacity-100">
-              <span>Read more</span>
+              <span>{t.article.readMore}</span>
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </div>
           </div>
