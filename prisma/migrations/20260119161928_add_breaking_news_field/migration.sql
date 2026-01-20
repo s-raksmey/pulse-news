@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE "Article" ADD COLUMN "isBreakingNews" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "Article" ADD COLUMN "isBreaking" BOOLEAN NOT NULL DEFAULT false;
