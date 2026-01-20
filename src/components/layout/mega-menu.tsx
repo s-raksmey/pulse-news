@@ -10,7 +10,7 @@ export default function MegaMenu({ activeKey }: { activeKey: string | null }) {
   if (!data) return null;
 
   return (
-    <div className="absolute inset-x-0 top-16 border-t border-slate-200 bg-white">
+    <div className="absolute inset-x-0 top-full border-t border-slate-200 bg-white">
       <div className="mx-auto max-w-7xl px-6 py-10">
         <div className="grid gap-10 md:grid-cols-3">
           <div>
