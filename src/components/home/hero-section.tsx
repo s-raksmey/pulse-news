@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import FeaturedArticleCard from "./featured-article-card";
 import { getTranslations, type Locale } from "@/lib/i18n";
 
@@ -33,7 +33,7 @@ interface HeroSectionProps {
   className?: string;
 }
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -44,7 +44,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 30 },
   show: {
     opacity: 1,
