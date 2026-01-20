@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Clock, User, ArrowRight } from "lucide-react";
+import { formatShortDate } from "@/lib/date";
 import { getTranslations, type Locale } from "@/lib/i18n";
 
 interface Article {
@@ -48,15 +49,9 @@ export default function FeaturedArticleCard({
 }: FeaturedArticleCardProps) {
   const articleUrl = `/${article.category?.slug || "news"}/${article.topic || "latest"}/${article.slug}`;
   const t = getTranslations(locale);
-  const dateLocale = locale === "km" ? "km-KH" : "en-US";
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString(dateLocale, {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
+  const formattedDate =
+    formatShortDate(article.publishedAt, locale, { includeYear: true }) ??
+    t.article.unknownDate;
 
   const sizeClasses = {
     large: "col-span-2 row-span-2",
@@ -142,7 +137,7 @@ export default function FeaturedArticleCard({
                   <span>{article.author.name}</span>
                 </div>
               )}
-              <span>{formatDate(article.publishedAt)}</span>
+              <span>{formattedDate}</span>
             </div>
 
             {/* Title */}

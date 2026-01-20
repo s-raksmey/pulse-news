@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion, type Variants } from "framer-motion";
 import { Share2, Copy, Facebook, Twitter, Send } from "lucide-react";
+import { formatLongDate } from "@/lib/date";
 import EditorRenderer from "@/components/renderer/editor-renderer";
 import { Breadcrumb } from "@/components/navigation/breadcrumb";
 import { useEffect, useState } from "react";
@@ -60,12 +61,7 @@ const stagger: Variants = {
    Helpers
 ========================= */
 function formatDate(value?: string | null) {
-  if (!value) return null;
-  return new Date(value).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  return formatLongDate(value, "en") ?? "";
 }
 
 function titleCase(s: string) {
