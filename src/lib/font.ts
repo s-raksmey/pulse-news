@@ -24,11 +24,6 @@ export const fontKhmerDigital = localFont({
       style: "normal",
     },
     {
-      path: "../../public/assets/fonts/KhmerDigital-Regular.ttf",
-      weight: "400",
-      style: "normal",
-    },
-    {
       path: "../../public/assets/fonts/KhmerDigital-Medium.ttf",
       weight: "500",
       style: "normal",
