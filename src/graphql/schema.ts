@@ -63,6 +63,57 @@ function normalizeTagSlug(slug: string) {
     .replace(/[^a-z0-9-]/g, "");
 }
 
+let breakingColumnAvailable: boolean | null = null;
+
+async function hasBreakingColumn(): Promise<boolean> {
+  if (breakingColumnAvailable !== null) return breakingColumnAvailable;
+
+  try {
+    const rows = await prisma.$queryRaw<{ exists: number }[]>`
+      SELECT 1 as exists
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND table_name = 'Article'
+        AND column_name = 'isBreaking'
+      LIMIT 1;
+    `;
+    breakingColumnAvailable = rows.length > 0;
+  } catch (error) {
+    console.warn("Failed to check for Article.isBreaking column.", error);
+    breakingColumnAvailable = false;
+  }
+
+  return breakingColumnAvailable;
+}
+
+async function getArticleSelect() {
+  const includeBreaking = await hasBreakingColumn();
+
+  return {
+    id: true,
+    title: true,
+    slug: true,
+    excerpt: true,
+    status: true,
+    topic: true,
+    contentJson: true,
+    coverImageUrl: true,
+    authorName: true,
+    seoTitle: true,
+    seoDescription: true,
+    ogImageUrl: true,
+    isFeatured: true,
+    isEditorsPick: true,
+    ...(includeBreaking ? { isBreaking: true } : {}),
+    pinnedAt: true,
+    viewCount: true,
+    publishedAt: true,
+    createdAt: true,
+    updatedAt: true,
+    categoryId: true,
+  };
+}
+
 /* =========================
    GraphQL Schema
 ========================= */
@@ -216,6 +267,7 @@ export const schema = createSchema({
       updatedAt: (p: any) => toIso(p.updatedAt),
       publishedAt: (p: any) => toIso(p.publishedAt),
       pinnedAt: (p: any) => toIso(p.pinnedAt),
+      isBreaking: (p: any) => p.isBreaking ?? false,
 
       category: async (parent: any) => {
         if (!parent.categoryId) return null;
@@ -257,55 +309,42 @@ export const schema = createSchema({
           where.category = { is: { slug: args.categorySlug } };
         }
 
+        const select = await getArticleSelect();
+
         return db.article.findMany({
           where,
           orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
           take: args.take ?? 20,
           skip: args.skip ?? 0,
-          select: {
-            // MAKE SURE contentJson is included
-            id: true,
-            title: true,
-            slug: true,
-            excerpt: true,
-            status: true,
-            topic: true,
-            contentJson: true, // <-- THIS IS CRITICAL
-            coverImageUrl: true,
-            authorName: true,
-            seoTitle: true,
-            seoDescription: true,
-            ogImageUrl: true,
-            isFeatured: true,
-            isEditorsPick: true,
-            isBreaking: true,
-            pinnedAt: true,
-            viewCount: true,
-            publishedAt: true,
-            createdAt: true,
-            updatedAt: true,
-            categoryId: true,
-          },
+          select,
         });
       },
 
-      articleBySlug: async (_: unknown, { slug }: { slug: string }) =>
-        db.article.findFirst({ 
-          where: { 
+      articleBySlug: async (_: unknown, { slug }: { slug: string }) => {
+        const select = await getArticleSelect();
+
+        return db.article.findFirst({
+          where: {
             slug,
-            status: "PUBLISHED" // Only show published articles
+            status: "PUBLISHED", // Only show published articles
           },
-          include: { category: true }
-        }),
+          select,
+        });
+      },
 
-      articleById: async (_: unknown, { id }: { id: string }) =>
-        db.article.findUnique({ 
+      articleById: async (_: unknown, { id }: { id: string }) => {
+        const select = await getArticleSelect();
+
+        return db.article.findUnique({
           where: { id },
-          include: { category: true }
-        }),
+          select,
+        });
+      },
 
-      topStories: async (_: unknown, { limit }: { limit?: number }) =>
-        db.article.findMany({
+      topStories: async (_: unknown, { limit }: { limit?: number }) => {
+        const select = await getArticleSelect();
+
+        return db.article.findMany({
           where: { isFeatured: true, status: "PUBLISHED" },
           orderBy: [
             // null-safe ordering
@@ -313,55 +352,77 @@ export const schema = createSchema({
             { publishedAt: "desc" },
           ],
           take: limit ?? 6,
-        }),
+          select,
+        });
+      },
 
-      editorsPicks: async (_: unknown, { limit }: { limit?: number }) =>
-        db.article.findMany({
+      editorsPicks: async (_: unknown, { limit }: { limit?: number }) => {
+        const select = await getArticleSelect();
+
+        return db.article.findMany({
           where: { isEditorsPick: true, status: "PUBLISHED" },
           orderBy: [
             { pinnedAt: { sort: "desc", nulls: "last" } },
             { publishedAt: "desc" },
           ],
           take: limit ?? 6,
-        }),
+          select,
+        });
+      },
 
-      breakingNews: async (_: unknown, { limit }: { limit?: number }) =>
-        db.article.findMany({
+      breakingNews: async (_: unknown, { limit }: { limit?: number }) => {
+        const includeBreaking = await hasBreakingColumn();
+        if (!includeBreaking) return [];
+
+        const select = await getArticleSelect();
+
+        return db.article.findMany({
           where: { isBreaking: true, status: "PUBLISHED" },
           orderBy: [
             { pinnedAt: { sort: "desc", nulls: "last" } },
             { publishedAt: "desc" },
           ],
           take: limit ?? 6,
-        }),
+          select,
+        });
+      },
 
       latestByCategory: async (
         _: unknown,
         { categorySlug, limit }: { categorySlug: string; limit?: number }
-      ) =>
-        db.article.findMany({
+      ) => {
+        const select = await getArticleSelect();
+
+        return db.article.findMany({
           where: {
             status: "PUBLISHED",
             category: { is: { slug: categorySlug } },
           },
           orderBy: { publishedAt: "desc" },
           take: limit ?? 6,
-        }),
+          select,
+        });
+      },
 
-      trending: async (_: unknown, { limit }: { limit?: number }) =>
-        db.article.findMany({
+      trending: async (_: unknown, { limit }: { limit?: number }) => {
+        const select = await getArticleSelect();
+
+        return db.article.findMany({
           where: { status: "PUBLISHED" },
           orderBy: { viewCount: "desc" },
           take: limit ?? 10,
-        }),
+          select,
+        });
+      },
 
       relatedArticles: async (
         _: unknown,
         { slug, limit }: { slug: string; limit?: number }
       ) => {
+        const select = await getArticleSelect();
         const article = await db.article.findFirst({
           where: { slug },
-          include: { tags: true }, // ArticleTag[]
+          select: { ...select, tags: true }, // ArticleTag[]
         });
 
         if (!article) return [];
@@ -379,6 +440,7 @@ export const schema = createSchema({
           },
           orderBy: { publishedAt: "desc" },
           take: limit ?? 6,
+          select,
         });
       },
 
@@ -422,6 +484,7 @@ export const schema = createSchema({
     Mutation: {
       upsertArticle: async (_: unknown, { id, input }: any) => {
         const data = ArticleInput.parse(input);
+        const includeBreaking = await hasBreakingColumn();
 
         const category = data.categorySlug
           ? await db.category.findFirst({
@@ -446,7 +509,6 @@ export const schema = createSchema({
 
           isFeatured: data.isFeatured ?? false,
           isEditorsPick: data.isEditorsPick ?? false,
-          isBreaking: data.isBreaking ?? false,
           pinnedAt: data.pinnedAt ? new Date(data.pinnedAt) : null,
 
           authorName: data.authorName ?? null,
@@ -459,6 +521,11 @@ export const schema = createSchema({
           categoryId: category?.id ?? null,
         };
 
+        if (includeBreaking) {
+          payload.isBreaking = data.isBreaking ?? false;
+        }
+
+        const select = await getArticleSelect();
         let article;
 
         if (id) {
@@ -466,17 +533,20 @@ export const schema = createSchema({
           article = await db.article.update({
             where: { id },
             data: payload,
+            select,
           });
         } else {
           // create OR update by slug (new page / retry-safe)
           const existing = await db.article.findUnique({
             where: { slug: data.slug },
+            select: { id: true },
           });
 
           if (existing) {
             article = await db.article.update({
               where: { id: existing.id },
               data: payload,
+              select,
             });
           } else {
             article = await db.article.create({
@@ -484,6 +554,7 @@ export const schema = createSchema({
                 ...payload,
                 publishedAt: status === "PUBLISHED" ? new Date() : null,
               },
+              select,
             });
           }
         }
@@ -521,6 +592,11 @@ export const schema = createSchema({
             status,
             publishedAt: status === "PUBLISHED" ? new Date() : null,
           },
+          select: {
+            id: true,
+            status: true,
+            publishedAt: true,
+          },
         });
       },
 
@@ -533,7 +609,10 @@ export const schema = createSchema({
       },
 
       deleteArticle: async (_: unknown, { id }: { id: string }) => {
-        const article = await db.article.findUnique({ where: { id } });
+        const article = await db.article.findUnique({
+          where: { id },
+          select: { id: true },
+        });
         if (!article) return false;
 
         await db.articleTag.deleteMany({
@@ -542,6 +621,7 @@ export const schema = createSchema({
 
         await db.article.delete({
           where: { id },
+          select: { id: true },
         });
 
         return true;
