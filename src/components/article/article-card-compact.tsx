@@ -44,7 +44,16 @@ export default function ArticleCardCompact({
   const articleUrl = `/${article.category?.slug || "news"}/${article.topic || "latest"}/${article.slug}`;
   
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    if (!dateString) {
+      return "Unknown date";
+    }
+
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) {
+      return "Unknown date";
+    }
+
+    return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
     });
