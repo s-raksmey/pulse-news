@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getGqlClient } from "@/lib/gql-client";
+import { getGqlClient } from "@/services/graphql-client";
 import { Q_BREAKING_NEWS } from "@/services/article.gql";
 
 export async function GET(request: NextRequest) {

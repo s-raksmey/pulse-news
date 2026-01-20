@@ -41,6 +41,7 @@ export const Q_ARTICLES = /* GraphQL */ `
       viewCount
       isFeatured
       isEditorsPick
+      isBreaking
       coverImageUrl
       ogImageUrl
       contentJson 
@@ -65,6 +66,7 @@ export const Q_ARTICLES_BY_TOPIC = /* GraphQL */ `
       excerpt
       topic
       status
+      isBreaking
       authorName
       publishedAt
       createdAt
@@ -91,6 +93,7 @@ export const Q_ARTICLE_BY_ID = /* GraphQL */ `
       excerpt
       topic
       status
+      isBreaking
       authorName
       publishedAt
       createdAt
@@ -140,6 +143,7 @@ export const M_UPSERT_ARTICLE = /* GraphQL */ `
       topic
       status
       publishedAt
+      isBreaking
       category {
         id
         name
@@ -179,6 +183,7 @@ export const Q_TOP_STORIES = /* GraphQL */ `
       excerpt
       topic
       contentJson
+      publishedAt
       category { name slug }
     }
   }
@@ -207,6 +212,7 @@ export const Q_BREAKING_NEWS = /* GraphQL */ `
       excerpt
       topic
       contentJson
+      publishedAt
       category { name slug }
     }
   }

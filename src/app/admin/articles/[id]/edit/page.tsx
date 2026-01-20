@@ -71,6 +71,7 @@ export default function EditArticlePage() {
   const [status, setStatus] = useState<"DRAFT" | "PUBLISHED" | "ARCHIVED">(
     "DRAFT"
   );
+  const [isBreaking, setIsBreaking] = useState(false);
 
   /** Editor initial content (ONE TIME) */
   const [initialContent, setInitialContent] = useState<OutputData>({
@@ -118,6 +119,7 @@ export default function EditArticlePage() {
       setCategorySlug(article.category?.slug ?? categoryOptions[0]);
       setTopic(article.topic ?? "");
       setStatus(article.status);
+      setIsBreaking(article.isBreaking ?? false);
       setInitialContent(article.contentJson ?? { blocks: [] });
 
       setLoading(false);
@@ -146,6 +148,7 @@ export default function EditArticlePage() {
           categorySlug,
           topic: topic || null,
           status,
+          isBreaking,
           contentJson,
         },
       });
@@ -303,6 +306,22 @@ export default function EditArticlePage() {
             <option value="PUBLISHED">PUBLISHED</option>
             <option value="ARCHIVED">ARCHIVED</option>
           </select>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            id="breaking-news"
+            type="checkbox"
+            className="h-4 w-4 rounded border-slate-300 text-red-600"
+            checked={isBreaking}
+            onChange={(e) => setIsBreaking(e.target.checked)}
+          />
+          <label
+            htmlFor="breaking-news"
+            className="text-xs font-semibold text-slate-600"
+          >
+            Mark as breaking news
+          </label>
         </div>
       </div>
 
