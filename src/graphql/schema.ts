@@ -77,7 +77,27 @@ async function hasBreakingColumn(): Promise<boolean> {
         AND column_name = 'isBreaking'
       LIMIT 1;
     `;
-    breakingColumnAvailable = rows.length > 0;
+    const columnExists = rows.length > 0;
+
+    if (!columnExists) {
+      try {
+        await prisma.$executeRaw`
+          ALTER TABLE "Article"
+          ADD COLUMN IF NOT EXISTS "isBreaking" BOOLEAN NOT NULL DEFAULT false;
+        `;
+        breakingColumnAvailable = true;
+        return true;
+      } catch (error) {
+        console.warn(
+          "Failed to add Article.isBreaking column automatically.",
+          error
+        );
+        breakingColumnAvailable = false;
+        return false;
+      }
+    }
+
+    breakingColumnAvailable = true;
   } catch (error) {
     console.warn("Failed to check for Article.isBreaking column.", error);
     breakingColumnAvailable = false;
