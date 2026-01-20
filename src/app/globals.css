@@ -16,6 +16,7 @@ body {
 }
 
 body {
+  font-family: var(--font-khmer-digital), ui-sans-serif, system-ui, sans-serif;
   @apply bg-white text-slate-900 antialiased;
 }
 
