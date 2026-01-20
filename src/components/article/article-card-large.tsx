@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Clock, User, MessageCircle, Share2 } from "lucide-react";
+import { formatShortDate } from "@/lib/date";
 import { getTranslations, type Locale } from "@/lib/i18n";
 
 interface Article {
@@ -48,15 +49,9 @@ export default function ArticleCardLarge({
   const articleUrl = `/${article.category?.slug || "news"}/${article.topic || "latest"}/${article.slug}`;
   const resolvedLocale = locale ?? "en";
   const t = getTranslations(resolvedLocale);
-  const dateLocale = resolvedLocale === "km" ? "km-KH" : "en-US";
-  
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString(dateLocale, {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
+  const formattedDate =
+    formatShortDate(article.publishedAt, resolvedLocale, { includeYear: true }) ??
+    t.article.unknownDate;
 
   const handleShare = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -130,7 +125,7 @@ export default function ArticleCardLarge({
                     <span>{article.author.name}</span>
                   </div>
                 )}
-                <span>{formatDate(article.publishedAt)}</span>
+                <span>{formattedDate}</span>
                 {article.readTime && (
                   <div className="flex items-center gap-1">
                     <Clock className="h-4 w-4" />
@@ -256,7 +251,7 @@ export default function ArticleCardLarge({
               <span>{article.author.name}</span>
             </div>
           )}
-          <span>{formatDate(article.publishedAt)}</span>
+          <span>{formattedDate}</span>
         </div>
 
         {/* Title */}

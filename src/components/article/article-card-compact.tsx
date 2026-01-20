@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Clock, TrendingUp } from "lucide-react";
+import { formatShortDate } from "@/lib/date";
 import { getTranslations, type Locale } from "@/lib/i18n";
 
 interface Article {
@@ -46,23 +47,8 @@ export default function ArticleCardCompact({
 }: ArticleCardCompactProps) {
   const articleUrl = `/${article.category?.slug || "news"}/${article.topic || "latest"}/${article.slug}`;
   const t = getTranslations(locale);
-  const dateLocale = locale === "km" ? "km-KH" : "en-US";
-  
-  const formatDate = (dateString: string) => {
-    if (!dateString) {
-      return t.article.unknownDate;
-    }
-
-    const date = new Date(dateString);
-    if (Number.isNaN(date.getTime())) {
-      return t.article.unknownDate;
-    }
-
-    return date.toLocaleDateString(dateLocale, {
-      month: "short",
-      day: "numeric",
-    });
-  };
+  const formattedDate =
+    formatShortDate(article.publishedAt, locale) ?? t.article.unknownDate;
 
   const formatViews = (views: number) => {
     if (views >= 1000000) {
@@ -125,7 +111,7 @@ export default function ArticleCardCompact({
 
             {/* Meta info */}
             <div className="flex items-center gap-3 text-xs text-slate-500">
-              <span>{formatDate(article.publishedAt)}</span>
+              <span>{formattedDate}</span>
               
               {article.readTime && (
                 <div className="flex items-center gap-1">
