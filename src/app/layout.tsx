@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import "./globals.css";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
+import { fontKhmerDigital } from "@/lib/font";
+import { cn } from "@/lib/utils";
 import BreakingNewsBar from "@/components/layout/breaking-news-bar";
 
 export const metadata: Metadata = {
@@ -20,7 +22,7 @@ export default async function RootLayout({
   const locale = requestedLocale === "km" ? "km" : "en";
 
   return (
-    <html lang={locale} data-locale={locale} className="bg-white">
+    <html lang={locale} data-locale={locale} className={cn(fontKhmerDigital.variable)}>
       <body className="min-h-screen bg-white text-slate-900">
         <Header locale={locale} />
         <BreakingNewsBar locale={locale} />

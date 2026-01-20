@@ -7,9 +7,9 @@
     "seed": "node --loader ts-node/esm prisma/seed.ts"
   },
   "scripts": {
-    "dev": "next dev --turbo",
+    "dev": "next dev --turbo -p 4000",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 4000",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
