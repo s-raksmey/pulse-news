@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import "./globals.css";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
@@ -10,10 +11,14 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const cookieStore = cookies();
+  const requestedLocale = cookieStore.get("locale")?.value;
+  const locale = requestedLocale === "km" ? "km" : "en";
+
   return (
-    <html lang="en" className="bg-white">
+    <html lang={locale} data-locale={locale} className="bg-white">
       <body className="min-h-screen bg-white text-slate-900">
-        <Header />
+        <Header locale={locale} />
         <BreakingNewsBar />
         <div className="min-h-[calc(100vh-140px)]">{children}</div>
         <Footer />

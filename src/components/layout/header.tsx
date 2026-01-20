@@ -18,7 +18,11 @@ const NAV_ITEMS = [
   { key: "culture", label: "Culture", href: "/culture" },
 ];
 
-export default function Header() {
+type HeaderProps = {
+  locale: "en" | "km";
+};
+
+export default function Header({ locale }: HeaderProps) {
   const [active, setActive] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -68,7 +72,7 @@ export default function Header() {
 
             {/* Desktop Navigation */}
             <div className="hidden items-center gap-3 md:flex">
-              <LanguageToggle />
+              <LanguageToggle initialLocale={locale} />
               <Link href="/admin" className="rounded-md border px-3 py-1.5 text-sm hover:bg-slate-100">
                 CMS
               </Link>
