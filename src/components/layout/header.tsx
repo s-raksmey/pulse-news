@@ -32,14 +32,14 @@ export default function Header({ locale }: HeaderProps) {
   return (
     <>
       <header className="relative z-50 border-b bg-white" onMouseLeave={() => setActive(null)}>
-        <div className="relative mx-auto h-16 max-w-7xl px-6">
-          <div className="absolute left-6 top-1/2 -translate-y-1/2">
+        <div className="mx-auto flex min-h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
+          <div className="flex shrink-0 items-center">
             <Link href="/" className="font-semibold tracking-wide">
               PULSE <span className="text-xs text-slate-500">NEWS</span>
             </Link>
           </div>
 
-          <nav className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-8 md:flex">
+          <nav className="hidden flex-1 flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm font-medium text-slate-800 md:flex lg:gap-x-6">
             {NAV_ITEMS.map((item) => {
               const hasDropdown = item.key !== "home";
               return (
@@ -47,7 +47,7 @@ export default function Header({ locale }: HeaderProps) {
                   key={item.key}
                   href={item.href}
                   onMouseEnter={() => setActive(hasDropdown ? item.key : null)}
-                  className="flex items-center gap-1 text-sm font-medium text-slate-800 hover:text-slate-900"
+                  className="flex items-center gap-1 leading-tight text-slate-800 hover:text-slate-900"
                 >
                   {t.nav[item.key as keyof typeof t.nav]}
                   {hasDropdown && (
@@ -62,7 +62,7 @@ export default function Header({ locale }: HeaderProps) {
             })}
           </nav>
 
-          <div className="absolute right-6 top-1/2 flex -translate-y-1/2 items-center gap-3">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             {/* Search Button */}
             <button
               onClick={() => setIsSearchOpen(true)}
