@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
+import BreakingNewsBar from "@/components/layout/breaking-news-bar";
 
 export const metadata: Metadata = {
   title: process.env.NEXT_PUBLIC_SITE_NAME || "Pulse News",
@@ -13,6 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="bg-white">
       <body className="min-h-screen bg-white text-slate-900">
         <Header />
+        <BreakingNewsBar />
         <div className="min-h-[calc(100vh-140px)]">{children}</div>
         <Footer />
       </body>

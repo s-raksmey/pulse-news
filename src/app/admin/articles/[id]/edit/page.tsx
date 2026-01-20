@@ -8,7 +8,6 @@ import { getGqlClient } from "@/services/graphql-client";
 import {
   Q_ARTICLE_BY_ID,
   M_UPSERT_ARTICLE,
-  M_SET_STATUS,
   M_DELETE_ARTICLE,
 } from "@/services/article.gql";
 
@@ -133,7 +132,7 @@ export default function EditArticlePage() {
   /* -------------------------
      Actions
   ------------------------- */
-  async function save() {
+  async function upsertArticle(nextStatus = status, redirectToList = false) {
     setSaving(true);
     try {
       const contentJson = (await editorRef.current?.save()) ?? { blocks: [] };
@@ -147,27 +146,29 @@ export default function EditArticlePage() {
           authorName, // ✅ ADDED
           categorySlug,
           topic: topic || null,
-          status,
+          status: nextStatus,
           isBreaking,
           contentJson,
         },
       });
 
-      router.push("/admin/articles");
+      setStatus(nextStatus);
+
+      if (redirectToList) {
+        router.push("/admin/articles");
+      }
     } finally {
       setSaving(false);
     }
   }
 
+  async function save() {
+    await upsertArticle(status, true);
+  }
+
   async function togglePublish() {
     const nextStatus = status === "PUBLISHED" ? "DRAFT" : "PUBLISHED";
-    setSaving(true);
-    try {
-      await client.request(M_SET_STATUS, { id, status: nextStatus });
-      setStatus(nextStatus);
-    } finally {
-      setSaving(false);
-    }
+    await upsertArticle(nextStatus, false);
   }
 
   async function remove() {

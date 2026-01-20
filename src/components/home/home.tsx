@@ -4,23 +4,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
-import BreakingNewsBanner from "./breaking-news-banner";
 import HeroSection from "./hero-section";
 import Sidebar from "@/components/layout/sidebar";
 import ArticleCardLarge from "@/components/article/article-card-large";
 
 type Article = any;
-
-/* =========================
-   Helpers
-========================= */
-function articleUrl(a: Article) {
-  const category = a?.category?.slug;
-  const topic = a?.topic ?? "latest";
-  const slug = a?.slug;
-  if (!category || !slug) return "#";
-  return `/${category}/${topic}/${slug}`;
-}
 
 function formatDate(value?: string | null) {
   if (!value) return null;
@@ -62,22 +50,12 @@ const stagger: Variants = {
 export default function HomePageClient({
   topStories,
   editorsPicks,
-  breakingNews,
   trending,
 }: {
   topStories: Article[];
   editorsPicks: Article[];
-  breakingNews: Article[];
   trending: Article[];
 }) {
-  // Transform breaking news data for the banner component
-  const breakingNewsForBanner = breakingNews.map(article => ({
-    id: article.id,
-    title: `Breaking: ${article.title}`,
-    url: articleUrl(article),
-    timestamp: article.publishedAt || new Date().toISOString(),
-  }));
-
   // Helper function to generate deterministic values based on article ID
   const generateDeterministicValue = (id: string, seed: number, min: number, max: number) => {
     let hash = 0;
@@ -123,9 +101,6 @@ export default function HomePageClient({
 
   return (
     <main className="min-h-screen bg-slate-50">
-      {/* Breaking News Banner */}
-      <BreakingNewsBanner breakingNews={breakingNewsForBanner} />
-
       {/* Hero Section */}
       {featuredArticles.length > 0 && (
         <HeroSection featuredArticles={featuredArticles} />
