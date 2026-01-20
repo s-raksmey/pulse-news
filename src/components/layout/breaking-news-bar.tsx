@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
 import BreakingNewsBanner from "@/components/home/breaking-news-banner";
+import { getTranslations, type Locale } from "@/lib/i18n";
 
 type BreakingNewsItem = {
   id: string;
@@ -36,9 +37,10 @@ function articleUrl(article: BreakingNewsItem) {
   return `/${category}/${topic}/${slug}`;
 }
 
-export default function BreakingNewsBar() {
+export default function BreakingNewsBar({ locale }: { locale: Locale }) {
   const pathname = usePathname();
   const [breakingNews, setBreakingNews] = useState<BannerItem[]>([]);
+  const t = getTranslations(locale);
 
   useEffect(() => {
     if (pathname?.startsWith("/admin") || pathname?.startsWith("/preview")) {
@@ -59,7 +61,7 @@ export default function BreakingNewsBar() {
 
         const mapped = data.data.map((article) => ({
           id: article.id,
-          title: `Breaking: ${article.title}`,
+          title: `${t.breaking.prefix} ${article.title}`,
           url: articleUrl(article),
           timestamp: article.publishedAt ?? new Date().toISOString(),
         }));

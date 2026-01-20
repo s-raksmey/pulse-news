@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import TrendingWidget from "@/components/sidebar/trending-widget";
 import NewsletterSignup from "@/components/sidebar/newsletter-signup";
+import { getTranslations, type Locale } from "@/lib/i18n";
 
 interface Article {
   id: string;
@@ -24,6 +25,7 @@ interface Article {
 }
 
 interface SidebarProps {
+  locale: Locale;
   trendingArticles?: Article[];
   showNewsletter?: boolean;
   className?: string;
@@ -51,10 +53,13 @@ const itemVariants = {
 };
 
 export default function Sidebar({
+  locale,
   trendingArticles = [],
   showNewsletter = true,
   className = "",
 }: SidebarProps) {
+  const t = getTranslations(locale);
+
   return (
     <motion.aside
       variants={containerVariants}
@@ -65,29 +70,29 @@ export default function Sidebar({
       {/* Trending Articles */}
       {trendingArticles.length > 0 && (
         <motion.div variants={itemVariants}>
-          <TrendingWidget articles={trendingArticles} />
+          <TrendingWidget locale={locale} articles={trendingArticles} />
         </motion.div>
       )}
 
       {/* Newsletter Signup */}
       {showNewsletter && (
         <motion.div variants={itemVariants}>
-          <NewsletterSignup />
+          <NewsletterSignup locale={locale} />
         </motion.div>
       )}
 
       {/* Categories Quick Navigation */}
       <motion.div variants={itemVariants}>
         <div className="rounded-xl bg-white p-6 shadow-lg">
-          <h3 className="mb-4 text-lg font-bold text-slate-900">Categories</h3>
+          <h3 className="mb-4 text-lg font-bold text-slate-900">{t.sidebar.categoriesTitle}</h3>
           <div className="space-y-2">
             {[
-              { name: "World", slug: "world", color: "#EF4444" },
-              { name: "Technology", slug: "tech", color: "#3B82F6" },
-              { name: "Business", slug: "business", color: "#10B981" },
-              { name: "Politics", slug: "politics", color: "#8B5CF6" },
-              { name: "Sports", slug: "sports", color: "#F59E0B" },
-              { name: "Culture", slug: "culture", color: "#EC4899" },
+              { name: t.nav.world, slug: "world", color: "#EF4444" },
+              { name: t.topics.technology, slug: "tech", color: "#3B82F6" },
+              { name: t.nav.business, slug: "business", color: "#10B981" },
+              { name: t.nav.politics, slug: "politics", color: "#8B5CF6" },
+              { name: t.nav.sports, slug: "sports", color: "#F59E0B" },
+              { name: t.nav.culture, slug: "culture", color: "#EC4899" },
             ].map((category) => (
               <a
                 key={category.slug}
@@ -110,7 +115,7 @@ export default function Sidebar({
       {/* Social Media Links */}
       <motion.div variants={itemVariants}>
         <div className="rounded-xl bg-white p-6 shadow-lg">
-          <h3 className="mb-4 text-lg font-bold text-slate-900">Follow Us</h3>
+          <h3 className="mb-4 text-lg font-bold text-slate-900">{t.sidebar.followUs}</h3>
           <div className="grid grid-cols-2 gap-3">
             {[
               { name: "Twitter", icon: "🐦", url: "#", color: "bg-blue-500" },
@@ -135,10 +140,10 @@ export default function Sidebar({
       <motion.div variants={itemVariants}>
         <div className="rounded-xl bg-slate-100 p-6 text-center">
           <div className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
-            Advertisement
+            {t.sidebar.advertisement}
           </div>
           <div className="flex h-32 items-center justify-center rounded-lg bg-slate-200">
-            <span className="text-slate-400">Ad Space</span>
+            <span className="text-slate-400">{t.sidebar.adSpace}</span>
           </div>
         </div>
       </motion.div>

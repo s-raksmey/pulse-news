@@ -1,4 +1,5 @@
 // app/(public)/page.tsx
+import { cookies } from "next/headers";
 import { getGqlClient } from "@/services/graphql-client";
 import {
   Q_TOP_STORIES,
@@ -11,6 +12,9 @@ export const revalidate = 60;
 
 export default async function HomePage() {
   const client = getGqlClient();
+  const cookieStore = await cookies();
+  const requestedLocale = cookieStore.get("locale")?.value;
+  const locale = requestedLocale === "km" ? "km" : "en";
 
   try {
     const [top, picks, trending] = await Promise.all([
@@ -21,6 +25,7 @@ export default async function HomePage() {
 
     return (
       <HomePageClient
+        locale={locale}
         topStories={top?.topStories ?? []}
         editorsPicks={picks?.editorsPicks ?? []}
         trending={trending?.trending ?? []}
@@ -30,6 +35,7 @@ export default async function HomePage() {
     console.error("Error fetching home page data:", error);
     return (
       <HomePageClient
+        locale={locale}
         topStories={[]}
         editorsPicks={[]}
         trending={[]}

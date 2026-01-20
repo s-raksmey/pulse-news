@@ -1,27 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import HeroSection from "./hero-section";
 import Sidebar from "@/components/layout/sidebar";
 import ArticleCardLarge from "@/components/article/article-card-large";
+import { getTranslations, type Locale } from "@/lib/i18n";
 
 type Article = any;
-
-function formatDate(value?: string | null) {
-  if (!value) return null;
-  return new Date(value).toLocaleDateString("en-US", {
-    month: "short",
-    day: "2-digit",
-    year: "numeric",
-  });
-}
-
-function cover(a: Article): string | null {
-  return a?.coverImage?.url ?? null;
-}
 
 /* =========================
    Motion Variants (SAFE)
@@ -48,14 +34,18 @@ const stagger: Variants = {
    Component
 ========================= */
 export default function HomePageClient({
+  locale,
   topStories,
   editorsPicks,
   trending,
 }: {
+  locale: Locale;
   topStories: Article[];
   editorsPicks: Article[];
   trending: Article[];
 }) {
+  const t = getTranslations(locale);
+
   // Helper function to generate deterministic values based on article ID
   const generateDeterministicValue = (id: string, seed: number, min: number, max: number) => {
     let hash = 0;
@@ -103,7 +93,7 @@ export default function HomePageClient({
     <main className="min-h-screen bg-slate-50">
       {/* Hero Section */}
       {featuredArticles.length > 0 && (
-        <HeroSection featuredArticles={featuredArticles} />
+        <HeroSection locale={locale} featuredArticles={featuredArticles} />
       )}
 
       {/* Main Content Grid */}
@@ -120,9 +110,9 @@ export default function HomePageClient({
                 className="space-y-8"
               >
                 <motion.div variants={fadeUp}>
-                  <h2 className="text-3xl font-bold text-slate-900">Editor's Picks</h2>
+                  <h2 className="text-3xl font-bold text-slate-900">{t.home.editorsPicksTitle}</h2>
                   <p className="mt-2 text-lg text-slate-600">
-                    Carefully curated stories from our editorial team
+                    {t.home.editorsPicksSubtitle}
                   </p>
                 </motion.div>
 
@@ -130,6 +120,7 @@ export default function HomePageClient({
                   {editorPicksTransformed.slice(0, 4).map((article, index) => (
                     <motion.div key={article.id} variants={fadeUp}>
                       <ArticleCardLarge
+                        locale={locale}
                         article={article}
                         layout="vertical"
                         className="h-full"
@@ -148,9 +139,9 @@ export default function HomePageClient({
               className="space-y-8"
             >
               <motion.div variants={fadeUp}>
-                <h2 className="text-3xl font-bold text-slate-900">Latest News</h2>
+                <h2 className="text-3xl font-bold text-slate-900">{t.home.latestNewsTitle}</h2>
                 <p className="mt-2 text-lg text-slate-600">
-                  Stay up to date with the most recent developments
+                  {t.home.latestNewsSubtitle}
                 </p>
               </motion.div>
 
@@ -160,6 +151,7 @@ export default function HomePageClient({
                   return (
                     <motion.div key={article.id} variants={fadeUp}>
                       <ArticleCardLarge
+                        locale={locale}
                         article={transformed}
                         layout="horizontal"
                         className="w-full"
@@ -175,6 +167,7 @@ export default function HomePageClient({
           <div className="lg:col-span-4">
             <div className="sticky top-8">
               <Sidebar
+                locale={locale}
                 trendingArticles={trendingTransformed}
                 showNewsletter={true}
               />

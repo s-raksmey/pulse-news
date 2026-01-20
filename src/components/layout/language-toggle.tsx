@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type LanguageToggleProps = {
   initialLocale: "en" | "km";
@@ -18,12 +18,18 @@ const LABEL_TO_LOCALE: Record<"EN" | "KH", LanguageToggleProps["initialLocale"]>
 
 export default function LanguageToggle({ initialLocale }: LanguageToggleProps) {
   const [lang, setLang] = useState<"EN" | "KH">(LOCALE_LABELS[initialLocale]);
+  const hasMountedRef = useRef(false);
 
   useEffect(() => {
     const locale = LABEL_TO_LOCALE[lang];
     document.documentElement.lang = locale;
     document.documentElement.dataset.locale = locale;
     document.cookie = `locale=${locale}; path=/; max-age=31536000; samesite=lax`;
+    if (hasMountedRef.current) {
+      window.location.reload();
+    } else {
+      hasMountedRef.current = true;
+    }
   }, [lang]);
 
   return (

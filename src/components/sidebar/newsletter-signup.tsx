@@ -3,18 +3,24 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Check, AlertCircle } from "lucide-react";
+import { getTranslations, type Locale } from "@/lib/i18n";
 
 interface NewsletterSignupProps {
+  locale: Locale;
   title?: string;
   description?: string;
   className?: string;
 }
 
 export default function NewsletterSignup({
-  title = "Stay Informed",
-  description = "Get the latest news and updates delivered to your inbox.",
+  locale,
+  title,
+  description,
   className = "",
 }: NewsletterSignupProps) {
+  const t = getTranslations(locale);
+  const resolvedTitle = title ?? t.newsletter.title;
+  const resolvedDescription = description ?? t.newsletter.description;
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -24,7 +30,7 @@ export default function NewsletterSignup({
     
     if (!email || !email.includes("@")) {
       setStatus("error");
-      setMessage("Please enter a valid email address");
+      setMessage(t.newsletter.invalidEmail);
       return;
     }
 
@@ -35,11 +41,11 @@ export default function NewsletterSignup({
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       setStatus("success");
-      setMessage("Thank you for subscribing!");
+      setMessage(t.newsletter.success);
       setEmail("");
     } catch (error) {
       setStatus("error");
-      setMessage("Something went wrong. Please try again.");
+      setMessage(t.newsletter.error);
     }
   };
 
@@ -55,8 +61,8 @@ export default function NewsletterSignup({
         <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
           <Mail className="h-6 w-6 text-blue-600" />
         </div>
-        <h3 className="text-lg font-bold text-slate-900">{title}</h3>
-        <p className="mt-1 text-sm text-slate-600">{description}</p>
+        <h3 className="text-lg font-bold text-slate-900">{resolvedTitle}</h3>
+        <p className="mt-1 text-sm text-slate-600">{resolvedDescription}</p>
       </div>
 
       {/* Form */}
@@ -66,7 +72,7 @@ export default function NewsletterSignup({
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
+            placeholder={t.newsletter.emailPlaceholder}
             className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
             disabled={status === "loading" || status === "success"}
           />
@@ -80,15 +86,15 @@ export default function NewsletterSignup({
           {status === "loading" ? (
             <div className="flex items-center justify-center gap-2">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-              <span>Subscribing...</span>
+              <span>{t.newsletter.subscribing}</span>
             </div>
           ) : status === "success" ? (
             <div className="flex items-center justify-center gap-2">
               <Check className="h-4 w-4" />
-              <span>Subscribed!</span>
+              <span>{t.newsletter.subscribed}</span>
             </div>
           ) : (
-            "Subscribe to Newsletter"
+            t.newsletter.subscribeButton
           )}
         </button>
       </form>
@@ -113,7 +119,7 @@ export default function NewsletterSignup({
 
       {/* Privacy Note */}
       <p className="mt-4 text-xs text-slate-500">
-        We respect your privacy. Unsubscribe at any time.
+        {t.newsletter.privacy}
       </p>
     </motion.div>
   );
